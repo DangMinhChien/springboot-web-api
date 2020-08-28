@@ -3,6 +3,7 @@ package com.laptrinhjavaweb.entity;
 import java.util.Date;
 
 import com.laptrinhjavaweb.annotations.Column;
+import com.laptrinhjavaweb.annotations.Id;
 import com.laptrinhjavaweb.annotations.Table;
 
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.Data;
 
 @Table(name = "building")
 public class BuildingEntity {
-
+	@Id
 	private Long id;
 	@Column(name = "name")
 	private String name;
@@ -31,47 +32,47 @@ public class BuildingEntity {
 	private String level;
 	@Column(name = "rentPrice")
 	private Integer rentPrice;
-	@Column(name = "rentPriceDescription")
+	@Column(name = "rentpricedescription")
 	private String rentPriceDescription;
-	@Column(name = "serviceFee")
+	@Column(name = "servicefee")
 	private String serviceFee;
-	@Column(name = "carFee")
+	@Column(name = "carfee")
 	private Integer carFee;
-	@Column(name = "motoFee")
+	@Column(name = "motofee")
 	private String motoFee;
-	@Column(name = "overtimeFee")
+	@Column(name = "overtimefee")
 	private String overtimeFee;
-	@Column(name = "waterFee")
+	@Column(name = "waterfee")
 	private String waterFee;
-	@Column(name = "electricityFee")
+	@Column(name = "electricityfee")
 	private String electricityFee;
 	@Column(name = "deposit")
 	private String deposit;
 	@Column(name = "payment")
 	private String payment;
-	@Column(name = "rentTime")
+	@Column(name = "renttime")
 	private String rentTime;
-	@Column(name = "decorationTime")
+	@Column(name = "decorationtime")
 	private String decorationTime;
-	@Column(name = "brokerageFee")
+	@Column(name = "brokeragefee")
 	private Float brokerageFee;
 	@Column(name = "types")
 	private String types;
 	@Column(name = "note")
 	private String note;
-	@Column(name = "linkBuilding")
+	@Column(name = "linkduilding")
 	private String linkBuilding;
 	@Column(name = "map")
 	private String map;
 	@Column(name = "avatar")
 	private String avatar;
-	@Column(name = "createdDate")
+	@Column(name = "createddate")
 	private Date createdDate;
-	@Column(name = "modifiedDate")
+	@Column(name = "modifieddate")
 	private Date modifiedDate;
-	@Column(name = "createdBy")
+	@Column(name = "createdby")
 	private String createdBy;
-	@Column(name = "modifiedBy")
+	@Column(name = "modifiedby")
 	private String modifiedBy;
 
 }

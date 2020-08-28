@@ -8,14 +8,14 @@ import com.laptrinhjavaweb.annotations.Table;
 
 import lombok.Data;
 @Data
-@Table(name = "rentarea")
-public class RentAreaEntity {
+@Table(name = "assignmentbuilding")
+public class AssignmentBuildingEntity {
 	@Id
 	private Long id;
 	@Column(name="buildingid")
-	private Long buildingId;
-	@Column(name="value")
-	private Integer value;
+	private Long buildingId ;
+	@Column(name="staffid")
+	private Long staffId;
 	@Column(name="createddate")
 	private Date createdDate;
 	@Column(name="modifieddate")

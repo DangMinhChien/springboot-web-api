@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.laptrinhjavaweb.annotations.Column;
+import com.laptrinhjavaweb.annotations.Id;
 import com.laptrinhjavaweb.annotations.Table;
 import com.laptrinhjavaweb.repository.JpaRepository;
 import com.laptrinhjavaweb.util.ResultSetMapper;
@@ -147,6 +148,143 @@ public class SimpleJpaRepository<T> implements JpaRepository<T> {
 	public T findById(Long Id) {
 
 		return null;
+	}
+
+	@Override
+	public void update(Object object)  {
+		String sql = builSQLUpdate();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {		
+			conn = EntityManagerFactory.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			stmt = conn.prepareStatement(sql);
+			int index = 1;
+			for (Field field : object.getClass().getDeclaredFields()) {
+				field.setAccessible(true);
+				if (field.isAnnotationPresent(Id.class)) {
+					stmt.setObject(object.getClass().getDeclaredFields().length, field.get(object));
+				}else {
+					stmt.setObject(index, field.get(object));
+					index++;
+				}
+				
+			}
+			stmt.executeUpdate();
+			conn.commit();
+		} catch (SQLException | IllegalAccessException se) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}
+				if (rs != null) {
+					rs.close();
+				}
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+	}
+
+	private String builSQLUpdate() {
+		String tableName = "";
+		if (zClass.isAnnotationPresent(Table.class)) {
+			Table table = zClass.getAnnotation(Table.class);
+			tableName = table.name();
+		}
+		
+		StringBuilder set = new StringBuilder("");
+		StringBuilder where = new StringBuilder("");
+		for (Field field : zClass.getDeclaredFields()) {
+			if (set.length() > 1) {
+				set.append(",");
+			}
+			if (field.isAnnotationPresent(Column.class)) {
+				Column column = field.getAnnotation(Column.class);
+				set.append(column.name()+"= ?");
+			}
+			if (field.isAnnotationPresent(Id.class)) {
+				Id id = field.getAnnotation(Id.class);
+				where.append(id.name()+"= ?");
+			}
+		}
+		String sql = "UPDATE "+tableName +" SET "+set.toString() +" WHERE "+where.toString();
+		return sql;
+	}
+
+	@Override
+	public void delete(Long id) {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			String sql = builSQLDelete();
+			conn = EntityManagerFactory.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, id);
+			stmt.executeUpdate();
+			conn.commit();
+		} catch (SQLException se) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}
+				if (rs != null) {
+					rs.close();
+				}
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+	}
+
+	private String builSQLDelete() {
+		String tableName = "";
+		if (zClass.isAnnotationPresent(Table.class)) {
+			Table table = zClass.getAnnotation(Table.class);
+			tableName = table.name();
+		}
+		
+		StringBuilder set = new StringBuilder("");
+		StringBuilder where = new StringBuilder("");
+		for (Field field : zClass.getDeclaredFields()) {
+			if (set.length() > 1) {
+				set.append(",");
+			}
+			if (field.isAnnotationPresent(Id.class)) {
+				Id id = field.getAnnotation(Id.class);
+				where.append(id.name()+"= ?");
+			}
+		}
+		String sql = "DELETE FROM "+tableName+" WHERE"+ where
+				;
+		return sql;
 	}
 
 }

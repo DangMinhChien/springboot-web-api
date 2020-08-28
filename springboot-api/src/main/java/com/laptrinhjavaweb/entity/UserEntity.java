@@ -7,19 +7,28 @@ import com.laptrinhjavaweb.annotations.Id;
 import com.laptrinhjavaweb.annotations.Table;
 
 import lombok.Data;
+
 @Data
-@Table(name = "rentarea")
-public class RentAreaEntity {
+@Table(name = "user")
+public class UserEntity {
 	@Id
 	private Long id;
-	@Column(name="buildingid")
-	private Long buildingId;
-	@Column(name="value")
-	private Integer value;
+	@Column(name="username")
+	private String userName;
+	@Column(name="password")
+	private String password;
+	@Column(name="fullname")
+	private String fullName;
+	@Column(name="phone")
+	private String phone;
+	@Column(name="email")
+	private String email;
+	@Column(name="status")
+	private Integer status;
 	@Column(name="createddate")
 	private Date createdDate;
 	@Column(name="modifieddate")
-	private Date modifiedDate;
+	private Date modifieddate;
 	@Column(name="createdby")
 	private String createdBy;
 	@Column(name="modifiedby")
