@@ -3,7 +3,6 @@ package com.laptrinhjavaweb.entity;
 import java.util.Date;
 
 import com.laptrinhjavaweb.annotations.Column;
-import com.laptrinhjavaweb.annotations.Id;
 import com.laptrinhjavaweb.annotations.Table;
 
 import lombok.Data;
@@ -11,7 +10,7 @@ import lombok.Data;
 @Data
 @Table(name = "user")
 public class UserEntity {
-	@Id
+	@Column(name = "id")
 	private Long id;
 	@Column(name="username")
 	private String userName;

@@ -5,7 +5,8 @@ import java.util.List;
 public interface JpaRepository<T>  {
 Long save(T t);
 List<T> findAll();
+List<T> findAll(String sql);
 T findById(Long Id);
-void update(T t);
-void delete(Long id);
+int update(T t);
+int delete(Long id);
 }

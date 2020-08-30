@@ -3,14 +3,13 @@ package com.laptrinhjavaweb.entity;
 import java.util.Date;
 
 import com.laptrinhjavaweb.annotations.Column;
-import com.laptrinhjavaweb.annotations.Id;
 import com.laptrinhjavaweb.annotations.Table;
 
 import lombok.Data;
 @Data
 @Table(name = "assignmentbuilding")
 public class AssignmentBuildingEntity {
-	@Id
+	@Column(name="id")
 	private Long id;
 	@Column(name="buildingid")
 	private Long buildingId ;

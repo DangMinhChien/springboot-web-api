@@ -6,18 +6,12 @@ import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
-
 import com.laptrinhjavaweb.annotations.Column;
-import com.laptrinhjavaweb.annotations.Id;
 import com.laptrinhjavaweb.annotations.Table;
-import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.repository.JpaRepository;
 import com.laptrinhjavaweb.util.ResultSetMapper;
 
@@ -123,25 +117,20 @@ public class SimpleJpaRepository<T> implements JpaRepository<T> {
 			String sql = "SELECT * FROM " + tableName + "where 1=1";
 			rs = stmt.executeQuery(sql);
 			return resultSetMapper.mapRow(rs, this.zClass);
-		} catch (SQLException se) {
-			// Handle errors for JDBC
-			se.printStackTrace();
-		} catch (Exception e) {
-			// Handle errors for Class.forName
+		}catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			// finally block used to close resources
 			try {
-				if (stmt != null)
+				if (conn != null) {
 					conn.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}		
+				
 			} catch (SQLException se) {
-			} // do nothing
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-			} // end finally try
-		} // end try
+			}  
+		} 
 		return null;
 	}
 
@@ -152,93 +141,72 @@ public class SimpleJpaRepository<T> implements JpaRepository<T> {
 	public T findById(Long id) {
 		ResultSetMapper<T> resultSetMapper = new ResultSetMapper<>();
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			String tableName = "";
-			String idName ="";
 			conn = EntityManagerFactory.getInstance().getConnection();
-			stmt = conn.createStatement();
 			if (zClass.isAnnotationPresent(Table.class)) {
 				Table table = zClass.getAnnotation(Table.class);
 				tableName = table.name();
 			}
-			if (zClass.isAnnotationPresent(Id.class)) {
-				Id idClass = zClass.getAnnotation(Id.class);
-				idName = idClass.name();
-			}
-			String sql = "SELECT * FROM "+ tableName+ "where " + idName+ id;
-			rs = stmt.executeQuery(sql);
-			ResultSetMetaData resultSetMetaData = rs.getMetaData();
-			Field[] fields = zClass.getDeclaredFields();
-			T object = zClass.newInstance();
-				while(rs.next()) {		
-					for (int i = 0; i < resultSetMetaData.getColumnCount(); i++) {
-						String columnName = resultSetMetaData.getColumnName(i+1);
-						Object columnValue = rs.getObject(columnName);
-						for (Field field : fields) {
-							Column column = field.getAnnotation(Column.class);
-							if (column.name().equals(columnName) && columnValue!=null) {
-								BeanUtils.setProperty(object, field.getName(), columnValue);
-								break;
-							}
-						}
-					}			
-				}
-			return object;
-		} catch (SQLException se) {
-			// Handle errors for JDBC
-			se.printStackTrace();
+			String sql = "SELECT * FROM " + tableName + "where id = ? ";
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, id);
+			rs = stmt.executeQuery();
+			List<T> result = resultSetMapper.mapRow(rs, this.zClass);
+			return result!=null ? result.get(0) :null;
 		} catch (Exception e) {
-			// Handle errors for Class.forName
 			e.printStackTrace();
 		} finally {
-			// finally block used to close resources
 			try {
-				if (stmt != null)
+				if (conn != null) {
 					conn.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}		
+				
 			} catch (SQLException se) {
-			} // do nothing
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-			} // end finally try
-		} // end try
+			}  
+		} 
 		return null;
 	}
 
 	@Override
-	public void update(Object object) {
+	public int update(Object object) {
 		String sql = builSQLUpdate();
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		int result = -1;
 		try {
 			conn = EntityManagerFactory.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			stmt = conn.prepareStatement(sql);
 			int index = 1;
+			Object id = null;
 			for (Field field : object.getClass().getDeclaredFields()) {
 				field.setAccessible(true);
-				if (field.isAnnotationPresent(Id.class)) {
-					stmt.setObject(object.getClass().getDeclaredFields().length, field.get(object));
-				} else {
+				if (!field.getName().equals("id")) {
 					stmt.setObject(index, field.get(object));
 					index++;
+				} else {
+					id=field.get(object);
 				}
 
 			}
-			stmt.executeUpdate();
+			stmt.setObject(index, id);
+			result = stmt.executeUpdate();
 			conn.commit();
+			return result ;
 		} catch (SQLException | IllegalAccessException se) {
 			try {
 				conn.rollback();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			return result ;
 		} finally {
 			try {
 				if (conn != null) {
@@ -263,47 +231,43 @@ public class SimpleJpaRepository<T> implements JpaRepository<T> {
 			Table table = zClass.getAnnotation(Table.class);
 			tableName = table.name();
 		}
-
 		StringBuilder set = new StringBuilder("");
-		StringBuilder where = new StringBuilder("");
 		for (Field field : zClass.getDeclaredFields()) {
 			if (set.length() > 1) {
 				set.append(",");
 			}
-			if (field.isAnnotationPresent(Column.class)) {
+			if (!field.getName().equals("id") &&field.isAnnotationPresent(Column.class)) {
 				Column column = field.getAnnotation(Column.class);
 				set.append(column.name() + "= ?");
 			}
-			if (field.isAnnotationPresent(Id.class)) {
-				Id id = field.getAnnotation(Id.class);
-				where.append(id.name() + "= ?");
-			}
 		}
-		String sql = "UPDATE " + tableName + " SET " + set.toString() + " WHERE " + where.toString();
+		String sql = "UPDATE " + tableName + " SET " + set.toString() + " WHERE  id =?";
 		return sql;
 	}
 
 	@Override
-	public void delete(Long id) {
+	public int delete(Long id) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		int result = -1;
 		try {
 			String sql = builSQLDelete();
 			conn = EntityManagerFactory.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			stmt = conn.prepareStatement(sql);
 			stmt.setLong(1, id);
-			stmt.executeUpdate();
+			result = stmt.executeUpdate();
 			conn.commit();
-		} catch (SQLException se) {
+			return result ;
+		} catch (SQLException se) {		
 			try {
 				conn.rollback();
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			return result;
 		} finally {
 			try {
 				if (conn != null) {
@@ -319,7 +283,7 @@ public class SimpleJpaRepository<T> implements JpaRepository<T> {
 				se.printStackTrace();
 			}
 		}
-
+		
 	}
 
 	private String builSQLDelete() {
@@ -328,20 +292,41 @@ public class SimpleJpaRepository<T> implements JpaRepository<T> {
 			Table table = zClass.getAnnotation(Table.class);
 			tableName = table.name();
 		}
-
-		StringBuilder set = new StringBuilder("");
-		StringBuilder where = new StringBuilder("");
-		for (Field field : zClass.getDeclaredFields()) {
-			if (set.length() > 1) {
-				set.append(",");
-			}
-			if (field.isAnnotationPresent(Id.class)) {
-				Id id = field.getAnnotation(Id.class);
-				where.append(id.name() + "= ?");
-			}
-		}
-		String sql = "DELETE FROM " + tableName + " WHERE" + where;
+		String sql = "DELETE FROM " + tableName + " WHERE id = ?" ;
 		return sql;
+	}
+
+	@Override
+	public List<T> findAll(String sql) {
+		ResultSetMapper<T> resultSetMapper = new ResultSetMapper<>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			String tableName = "";
+			conn = EntityManagerFactory.getInstance().getConnection();
+			stmt = conn.createStatement();
+			if (zClass.isAnnotationPresent(Table.class)) {
+				Table table = zClass.getAnnotation(Table.class);
+				tableName = table.name();
+			}
+			rs = stmt.executeQuery(sql);
+			return resultSetMapper.mapRow(rs, this.zClass);
+		}catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}		
+				
+			} catch (SQLException se) {
+			}  
+		} 
+		return null;
 	}
 
 }

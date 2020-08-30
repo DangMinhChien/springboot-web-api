@@ -13,17 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.laptrinhjavaweb.buider.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
-import com.laptrinhjavaweb.dto.Enum;
+import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
 import com.laptrinhjavaweb.emun.District;
 import com.laptrinhjavaweb.emun.Transaction;
 import com.laptrinhjavaweb.emun.TypeBuilding;
+import com.laptrinhjavaweb.service.IAssignmentBuildingService;
 import com.laptrinhjavaweb.service.IBuildingService;
+import com.laptrinhjavaweb.service.impl.AssignmentBuildingServiceImpl;
 import com.laptrinhjavaweb.service.impl.BuildingServiceImpl;
+import com.laptrinhjavaweb.dto.output.Enum;
 
 @RestController
 public class BuildingAPI {
 	private IBuildingService buidingService = new BuildingServiceImpl();
-
+	private IAssignmentBuildingService assignmentBuildingService = new AssignmentBuildingServiceImpl();
 // Phương thức get search
 	@GetMapping("/buildings")
 	public List<BuildingDTO> getBuildings(@RequestParam Map<String, String> requestParams , @RequestParam ArrayList<String> types) {
@@ -97,44 +100,28 @@ public class BuildingAPI {
 	
 	//Thêm tòa nhà
 	@PostMapping("/building")
-	public BuildingDTO createBuildings(@RequestBody BuildingDTO buidBuildingDTO) {		
+	public BuildingDTO addBuilding(@RequestBody BuildingDTO buidBuildingDTO) {		
 		return buidingService.save(buidBuildingDTO);
 	}
 	
-	//Danh sách quận
-	@GetMapping("/district")
-	public List<Enum> getDistrict() {	
-		List<Enum> result = new ArrayList<Enum>();
-		 for (District d : District.values()) {
-			 Enum enum1 = new Enum();
-			 enum1.setName(d.getName());
-			 enum1.setValue(d.getValue());
-			 result.add(enum1);
-	        }
-		return result;
-	}
+
+	//Giao tòa nhà cho nhân viên
+		@PostMapping("/building/assignment")
+		public Boolean assignmentBuilding(@RequestBody AssignmentBuildingInput assignmentBuildingInput) {		
+			return assignmentBuildingService.assignmentBuilding(assignmentBuildingInput);
+		}
+	
 	//Danh sách loại tòa nhà
-	@GetMapping("/typebuilding")
+	@GetMapping("/building-type")
 	public List<Enum> getTypeBuilding() {	
-		List<Enum> result = new ArrayList<Enum>();
+		List<Enum> result = new ArrayList<>();
 		 for (TypeBuilding t : TypeBuilding.values()) {
 			 Enum enum1 = new Enum();
+			 enum1.setCode(t.name());
 			 enum1.setName(t.getName());
-			 enum1.setValue(t.getValue());
 			 result.add(enum1);
 	        }
 		return result;
 	}
-	//Danh loại giao dich
-	@GetMapping("/transaction")
-	public List<Enum> getTransaction() {	
-		List<Enum> result = new ArrayList<Enum>();
-		 for (Transaction t : Transaction.values()) {
-			 Enum enum1 = new Enum();
-			 enum1.setName(t.getName());
-			 enum1.setValue(t.getValue());
-			 result.add(enum1);
-	        }
-		return result;
-	}
+
 }

@@ -1,21 +1,22 @@
-package com.laptrinhjavaweb.dto;
+package com.laptrinhjavaweb.dto.output;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class AssignmentBuildingDTO {
-	private Long id;
-	private Long buildingId ;
-	private List<Long> staffIds;
+public class UserOutput {
+	private Long id;	
+	private String userName;	
+	private String password;	
+	private String fullName;
+	private String phone;
+	private String email;
+	private Integer status;
+	private String checked="";
 	private Date createdDate;
 	private Date modifiedDate;
 	private String createdBy;
