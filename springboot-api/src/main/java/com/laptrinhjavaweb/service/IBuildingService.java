@@ -8,5 +8,7 @@ import com.laptrinhjavaweb.dto.BuildingDTO;
 public interface IBuildingService {
 List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder);
 BuildingDTO save(BuildingDTO buildingDTO);
+Boolean update(BuildingDTO buildingDTO);
 List<BuildingDTO> findAll();
+void delete(long[] ids);
 }

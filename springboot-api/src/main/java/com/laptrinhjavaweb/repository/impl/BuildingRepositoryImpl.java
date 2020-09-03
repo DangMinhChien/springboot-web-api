@@ -26,41 +26,18 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/javaweb62020module1", "root", "123456");
+			conn = EntityManagerFactory.getInstance().getConnection();
 			stmt = conn.createStatement();
 			StringBuilder sql = new StringBuilder("SELECT * FROM building b ");
 			// Câu inner Join
-			if (buildingSearchBuilder.getManager() != null || buildingSearchBuilder.getManagerMobile() != null
-					|| buildingSearchBuilder.getStaffUserName() != null) {
-				sql.append("inner join assignmentbuilding ab on ab.buildingid = b.id "
-						+ "inner join user u on u.id = ab.staffid");
+			if (buildingSearchBuilder.getStaffId() != null) {
+				sql.append("inner join assignmentbuilding a on a.buildingid = b.id ");
 			}
 			sql.append("where 1=1");
-			sql = buildingSearchBuilder(buildingSearchBuilder, sql);
-			// Tìm loại toàn nhà
-			ArrayList<String> types = buildingSearchBuilder.getTypes();
-			if (!types.isEmpty()) {
-				sql.append("and ( 1=1 ");
-				for (String type : types) {
-					sql.append("or b.type like '%" + type + "%'");
-				}
-				sql.append(")");
-			}
-			// Tìm theo diện tích
-			if (buildingSearchBuilder.getRentAreaFrom() == null || buildingSearchBuilder.getRentAreaTo() == null) {
-				if (buildingSearchBuilder.getRentAreaFrom() != null) {
-					sql.append("and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value " + ">="
-							+ buildingSearchBuilder.getRentAreaFrom() + ")");
-				} else if (buildingSearchBuilder.getRentAreaTo() != null) {
-					sql.append("and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value " + "<="
-							+ buildingSearchBuilder.getRentAreaFrom() + ")");
-				}
-			} else if (buildingSearchBuilder.getRentAreaFrom() != null
-					&& buildingSearchBuilder.getRentAreaTo() != null) {
-				sql.append("and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id AND (r.value between "
-						+ buildingSearchBuilder.getRentAreaFrom() + "and" + buildingSearchBuilder.getRentAreaTo()
-						+ "))");
+			sql = buildingSearchBuilderCommon(buildingSearchBuilder, sql);
+			sql = buildingSearchBuilderSpecial(buildingSearchBuilder, sql);
+			if (buildingSearchBuilder.getStaffId() != null) {
+				sql.append("and a.staffid = " + buildingSearchBuilder.getStaffId() + "");
 			}
 			rs = stmt.executeQuery(sql.toString());
 			while (rs.next()) {
@@ -100,12 +77,45 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 		return results;
 	}
 
+	private StringBuilder buildingSearchBuilderSpecial(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
+		// rentPrice
+		if (buildingSearchBuilder.getRentAreaFrom() != null) {
+			sql.append("and " + "rentprice >=" + buildingSearchBuilder.getRentAreaFrom() + "");
+		}
+		if (buildingSearchBuilder.getRentAreaTo() != null) {
+			sql.append("and " + "rentprice <=" + buildingSearchBuilder.getRentAreaTo() + "");
+		}
+		// Tìm loại toàn nhà
+		if (buildingSearchBuilder.getTypes() != null) {
+			int lengthType = buildingSearchBuilder.getTypes().length;
+			sql.append("and ( b.type like '%" + buildingSearchBuilder.getTypes()[0] + "%'");
+			for (int i = 1; i < lengthType; i++) {
+				if (i >= 1) {
+					sql.append("or b.type like '%" + buildingSearchBuilder.getTypes()[i] + "%'");
+				}
+			}
+			sql.append(")");
+		}
+		// Tìm theo diện tích
+		if (buildingSearchBuilder.getRentAreaFrom() != null || buildingSearchBuilder.getRentAreaTo() != null) {
+			sql.append(" and EXISTS (SELECT * FROM rentarea r WHERE r.buildingid = b.id");
+			if (buildingSearchBuilder.getRentAreaFrom() != null) {
+				sql.append(" and r.value >=" + buildingSearchBuilder.getRentAreaFrom() + "");
+			} else if (buildingSearchBuilder.getRentAreaTo() != null) {
+				sql.append(" and r.value <=" + buildingSearchBuilder.getRentAreaTo() + "");
+			}
+			sql.append("))");
+		}
+		return sql;
+
+	}
+
 	// Xử lý buildingSearchBuilder
-	private StringBuilder buildingSearchBuilder(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
+	private StringBuilder buildingSearchBuilderCommon(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
 		try {
 			Field[] fields = BuildingSearchBuilder.class.getDeclaredFields();
 			for (Field field : fields) {
-				if (!field.getName().equals("staffUseName") && !field.getName().startsWith("rentArea")
+				if (!field.getName().equals("staffId") && !field.getName().startsWith("rentArea")
 						&& !field.getName().startsWith("rentPrice") && !field.getName().equals("types")) {
 					field.setAccessible(true);
 					String fieldType = field.getType().getName();
@@ -120,19 +130,7 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 									+ field.get(buildingSearchBuilder) + "%'");
 						}
 					}
-				} // rentPrice
-				else if (field.getName().startsWith("rentPrice")) {
-					if (field.getName().equals("rentPriceFrom") && field.get(buildingSearchBuilder) != null) {
-						sql.append("and " + ">=" + field.get(buildingSearchBuilder) + "rentprice");
-					} else if (field.getName().equals("rentPriceTo") && field.get(buildingSearchBuilder) != null) {
-						sql.append("and " + "<=" + field.get(buildingSearchBuilder) + "rentprice");
-					}
-				} else if (field.getName().equals("staffUseName")) {
-					if (field.get(buildingSearchBuilder) != null) {
-						sql.append("and  u.username = '" + field.get(buildingSearchBuilder) + "'");
-					}
 				}
-
 			}
 			return sql;
 		} catch (IllegalAccessException e) {
@@ -233,8 +231,7 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 //		} catch (Exception e) {
 //		}
 //	}
-	
-	
+
 //	// Xử lý builSQLsaveBuilding
 //	private StringBuilder builSQLsaveBuilding(BuildingDTO buildingDTO, StringBuilder sql) {
 //		try {
@@ -263,7 +260,7 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 //
 //	}
 
-	//Tìm theo id tòa nhà
+	// Tìm theo id tòa nhà
 //	@Override
 //	public BuildingDTO findById(Long buildingId) {
 //		BuildingDTO buildingDTO = new BuildingDTO();
@@ -329,8 +326,7 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 //		return buildingDTO;
 //	}
 
-	
-	//Save tòa nhà 
+	// Save tòa nhà
 	@Override
 	public Long saveWithTransaction(BuildingDTO buildingDTO) {
 		Connection conn = null;
@@ -350,11 +346,11 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 				buildingId = rs.getLong(1);
 			}
 			StringBuilder sqlRentArea = new StringBuilder("INSERT INTO rentarea VALUES ( ?,?)");
-			stmt = conn.prepareStatement(sqlRentArea.toString(), Statement.RETURN_GENERATED_KEYS);
+			stmt = conn.prepareStatement(sqlRentArea.toString());
 			// Insert RentArea
 			for (String value : buildingDTO.getRentAreas()) {
-				stmt.setInt(1,Integer.parseInt(value));
-				stmt.setLong(2,buildingId);
+				stmt.setInt(1, Integer.parseInt(value));
+				stmt.setLong(2, buildingId);
 				stmt.executeUpdate();
 			}
 			conn.commit();
@@ -386,7 +382,5 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 
 		}
 	}
-
-
 
 }

@@ -39,7 +39,8 @@ private BuildingConverter buildingConverter = new BuildingConverter();
 //		return buildingRepository.findById(buildingId);
 		BuildingEntity buildingEntity =buildingConverter.convertToEntity(buildingDTO);
 		Long id = buildingRepository.save(buildingEntity);
-		return null;
+		BuildingDTO dto = buildingConverter.convertToDto(buildingRepository.findById(id));
+		return dto;
 	}
 	@Override
 	public List<BuildingDTO> findAll() {
@@ -51,5 +52,16 @@ private BuildingConverter buildingConverter = new BuildingConverter();
 		}
 		return results;
 	}
-
+	@Override
+	public Boolean update(BuildingDTO buildingDTO) {
+		BuildingEntity buildingEntity =buildingConverter.convertToEntity(buildingDTO);
+		int result =buildingRepository.update(buildingEntity);
+		return result==1 ? true : false ;
+	}
+	@Override
+	public void delete(long[] ids) {
+		for(long item: ids) {
+			buildingRepository.delete(item);
+		}
+	}
 }

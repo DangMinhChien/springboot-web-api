@@ -15,7 +15,7 @@ import com.laptrinhjavaweb.service.impl.UserServiceImpl;
 public class UserAPI {
 	private IUserService userService = new UserServiceImpl();
 	@PostMapping("/users/manager-building")
-	public List<UserOutput> createBuildings(@RequestBody UserInput userInput) {		
+	public List<UserOutput> getUser(@RequestBody UserInput userInput) {		
 		return userService.findAllUser(userInput.getBuildingId(), userInput.getRole());
 	}
 	

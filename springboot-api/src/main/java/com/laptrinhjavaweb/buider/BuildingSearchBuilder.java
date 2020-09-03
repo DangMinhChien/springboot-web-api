@@ -1,7 +1,5 @@
 package com.laptrinhjavaweb.buider;
 
-import java.util.ArrayList;
-
 import lombok.Builder;
 import lombok.Data;
 @Data
@@ -15,12 +13,12 @@ public class BuildingSearchBuilder {
 	private String srteet;
 	private String direction;
 	private String level;
-	private ArrayList<String> types = new ArrayList<String>();
+	private String[] types ;
 	private Integer rentAreaFrom;
 	private Integer rentAreaTo;
 	private Integer rentPriceFrom;
 	private Integer rentPriceTo;
 	private String manager;
 	private String managerMobile;
-	private String staffUserName;
+	private Long staffId;
 }
