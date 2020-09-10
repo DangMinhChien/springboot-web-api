@@ -7,7 +7,7 @@ import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.entity.BuildingEntity;
 
 public interface IBuildingRepository extends JpaRepository<BuildingEntity>{
-	List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder);
+	List<BuildingEntity> getBuildings(BuildingSearchBuilder buildingSearchBuilder);
 	
 //	Long save(BuildingDTO buildingDTO);
 	Long saveWithTransaction(BuildingDTO buildingDTO);

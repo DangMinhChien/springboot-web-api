@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.laptrinhjavaweb.dto.output.Enum;
+import com.laptrinhjavaweb.dto.TransactionDTO;
 import com.laptrinhjavaweb.emun.Transaction;
 
 
@@ -14,13 +14,13 @@ import com.laptrinhjavaweb.emun.Transaction;
 public class TransactionAPI {
 	//Danh loại giao dich
 	@GetMapping("/transaction")
-	public List<Enum> getTransaction() {	
-		List<Enum> result = new ArrayList<Enum>();
+	public List<TransactionDTO> getTransaction() {	
+		List<TransactionDTO> result = new ArrayList<TransactionDTO>();
 		 for (Transaction t : Transaction.values()) {
-			 Enum enum1 = new Enum();
-			 enum1.setCode(t.name());
-			 enum1.setName(t.getName());
-			 result.add(enum1);
+			 TransactionDTO transactionDTO = new TransactionDTO();
+			 transactionDTO.setCode(t.name());
+			 transactionDTO.setName(t.getName());
+			 result.add(transactionDTO);
 	        }
 		return result;
 	}

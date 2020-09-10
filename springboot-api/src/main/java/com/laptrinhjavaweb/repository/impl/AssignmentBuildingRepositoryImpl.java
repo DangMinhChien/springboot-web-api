@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
+import com.laptrinhjavaweb.entity.AssignmentBuildingEntity;
 import com.laptrinhjavaweb.repository.IAssignmentBuildingRepository;
 
-public class AssignmentBuildingRepositoryImpl implements IAssignmentBuildingRepository{
+public class AssignmentBuildingRepositoryImpl extends SimpleJpaRepository<AssignmentBuildingEntity> implements IAssignmentBuildingRepository {
 
 	@Override
 	public Boolean assignmentBuilding(AssignmentBuildingInput assignmentBuildingInput) {
@@ -110,5 +111,9 @@ public class AssignmentBuildingRepositoryImpl implements IAssignmentBuildingRepo
 		}
 		return list;
 	}
-
+	@Override
+	public List<AssignmentBuildingEntity> findByBuildingIdAndStaffId(Long buildingId ,Long staffId) {
+		String sql = "SELECT * FROM assignmentbuilding where buildingid = " + buildingId + "and staffid= = " + staffId + "";
+		return this.findAll(sql);
+	}
 }

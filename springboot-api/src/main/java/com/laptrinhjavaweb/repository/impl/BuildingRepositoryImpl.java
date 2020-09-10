@@ -20,14 +20,8 @@ import com.laptrinhjavaweb.repository.IBuildingRepository;
 public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> implements IBuildingRepository {
 //Tìm kiếm tòa nhà 
 	@Override
-	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
-		List<BuildingDTO> results = new ArrayList<BuildingDTO>();
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		try {
-			conn = EntityManagerFactory.getInstance().getConnection();
-			stmt = conn.createStatement();
+	public List<BuildingEntity> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
+		List<BuildingEntity> results = new ArrayList<BuildingEntity>();
 			StringBuilder sql = new StringBuilder("SELECT * FROM building b ");
 			// Câu inner Join
 			if (buildingSearchBuilder.getStaffId() != null) {
@@ -39,41 +33,7 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 			if (buildingSearchBuilder.getStaffId() != null) {
 				sql.append("and a.staffid = " + buildingSearchBuilder.getStaffId() + "");
 			}
-			rs = stmt.executeQuery(sql.toString());
-			while (rs.next()) {
-
-				BuildingDTO buildingDTO = new BuildingDTO();
-				String name = rs.getString("name");
-				Integer numberOfBasement = rs.getInt("numberOfBasement");
-				buildingDTO.setName(name);
-				buildingDTO.setNumberOfBasement(numberOfBasement);
-				results.add(buildingDTO);
-			}
-
-		} catch (SQLException se) {
-			// Handle errors for JDBC
-			se.printStackTrace();
-		} catch (Exception e) {
-			// Handle errors for Class.forName
-			e.printStackTrace();
-		} finally {
-			// finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se) {
-			} // do nothing
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-			}
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (SQLException se) {
-			}
-		} // end try
+			results = this.findAll(sql.toString());
 		return results;
 	}
 
