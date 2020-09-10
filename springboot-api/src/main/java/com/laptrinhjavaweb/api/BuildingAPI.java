@@ -119,7 +119,7 @@ public class BuildingAPI {
 	}
 
 	// Delete tòa nhà
-	@DeleteMapping(value = "/new")
+	@DeleteMapping(value = "/buildings")
 	public void deleteNew(@RequestBody long[] ids) {
 		buidingService.delete(ids);
 	}
