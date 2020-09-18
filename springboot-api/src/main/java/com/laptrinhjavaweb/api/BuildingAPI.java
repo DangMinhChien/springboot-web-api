@@ -1,8 +1,10 @@
 package com.laptrinhjavaweb.api;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -133,13 +135,21 @@ public class BuildingAPI {
 	// Danh sách loại tòa nhà
 	@GetMapping("/building-type")
 	public List<BuildingTypeDTO> getTypeBuilding() {
-		List<BuildingTypeDTO> result = new ArrayList<>();
-		for (TypeBuilding t : TypeBuilding.values()) {
-			BuildingTypeDTO buildingTypeDTO = new BuildingTypeDTO();
-			buildingTypeDTO.setCode(t.name());
-			buildingTypeDTO.setName(t.getName());
-			result.add(buildingTypeDTO);
-		}
+//		List<BuildingTypeDTO> result = new ArrayList<>();
+//		for (TypeBuilding t : TypeBuilding.values()) {
+//			BuildingTypeDTO buildingTypeDTO = new BuildingTypeDTO();
+//			buildingTypeDTO.setCode(t.name());
+//			buildingTypeDTO.setName(t.getName());
+//			result.add(buildingTypeDTO);
+//		}
+//		return result;
+		List<BuildingTypeDTO> result = Arrays.stream(TypeBuilding.values())
+										.map(item -> {
+											BuildingTypeDTO buildingTypeDTO = new BuildingTypeDTO();
+											buildingTypeDTO.setCode(item.name());
+											buildingTypeDTO.setName(item.getName());
+											return buildingTypeDTO;
+										}).collect(Collectors.toList());	
 		return result;
 	}
 
