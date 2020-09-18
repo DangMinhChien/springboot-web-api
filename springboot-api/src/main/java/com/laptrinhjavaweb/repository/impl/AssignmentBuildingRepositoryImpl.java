@@ -112,8 +112,14 @@ public class AssignmentBuildingRepositoryImpl extends SimpleJpaRepository<Assign
 		return list;
 	}
 	@Override
-	public List<AssignmentBuildingEntity> findByBuildingIdAndStaffId(Long buildingId ,Long staffId) {
+	public Boolean isAssignmentbuilding(Long buildingId ,Long staffId) {
 		String sql = "SELECT * FROM assignmentbuilding where buildingid = " + buildingId + "and staffid= = " + staffId + "";
-		return this.findAll(sql);
+		List<AssignmentBuildingEntity> result= this.findAll(sql);
+		if (result.isEmpty()) {
+			return false;
+		}else {
+			return true;
+		}
+		
 	}
 }

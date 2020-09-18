@@ -2,6 +2,7 @@ package com.laptrinhjavaweb.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.laptrinhjavaweb.converter.UserConverter;
 import com.laptrinhjavaweb.dto.output.UserOutput;
@@ -19,7 +20,7 @@ public class UserServiceImpl implements IUserService {
 	private UserConverter userConverter = new UserConverter();
 	@Override
 	public List<UserOutput> findAllUser(Long buildingId, String role) {
-		List<UserOutput> result = new ArrayList<>();
+//		List<UserOutput> result = new ArrayList<>();
 //		List<UserEntity> userAssignmentBuildings = userRepository.findUsersAssignmentByBuildingId(buildingId, role);
 		List<UserEntity> staffs = userRepository.findAllUser(role);
 //		for (int i = 0; i < staffs.size(); i++) {
@@ -32,15 +33,20 @@ public class UserServiceImpl implements IUserService {
 //			}
 //			result.add(output);
 //		}
-		for (UserEntity id : staffs) {
-			List<AssignmentBuildingEntity> assignmentBuildingEntity = null;
-			assignmentBuildingEntity = assignmentBuildingRepository.findByBuildingIdAndStaffId(buildingId, id.getId());
-			if (assignmentBuildingEntity != null && !assignmentBuildingEntity.isEmpty()) {
-				UserOutput output = userConverter.convertToDto(id);
+//		for (UserEntity userEntity : staffs) {
+//			UserOutput output = userConverter.convertToDto(userEntity);
+//			if (assignmentBuildingRepository.isAssignmentbuilding(buildingId, output.getId()) == true) {				
+//				output.setChecked("checked");
+//			}
+//			result.add(output);
+//		}	
+		List<UserOutput> result = staffs.stream().map(item -> {
+			UserOutput output = userConverter.convertToDto(item);
+			if (assignmentBuildingRepository.isAssignmentbuilding(buildingId, output.getId()) == true) {				
 				output.setChecked("checked");
-				result.add(output);
 			}
-		}	
+			return output;
+		}).collect(Collectors.toList());
 		return result;
 	}
 

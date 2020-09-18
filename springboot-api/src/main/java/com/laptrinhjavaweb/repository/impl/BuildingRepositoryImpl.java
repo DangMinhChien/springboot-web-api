@@ -2,7 +2,6 @@ package com.laptrinhjavaweb.repository.impl;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,13 +46,19 @@ public class BuildingRepositoryImpl extends SimpleJpaRepository<BuildingEntity> 
 		}
 		// Tìm loại toàn nhà
 		if (buildingSearchBuilder.getTypes() != null) {
-			int lengthType = buildingSearchBuilder.getTypes().length;
-			sql.append("and ( b.type like '%" + buildingSearchBuilder.getTypes()[0] + "%'");
-			for (int i = 1; i < lengthType; i++) {
-				if (i >= 1) {
-					sql.append("or b.type like '%" + buildingSearchBuilder.getTypes()[i] + "%'");
-				}
-			}
+//			int lengthType = buildingSearchBuilder.getTypes().length;
+//			sql.append("and ( b.type like '%" + buildingSearchBuilder.getTypes()[0] + "%'");
+//			for (int i = 1; i < lengthType; i++) {
+//				if (i >= 1) {
+//					sql.append("or b.type like '%" + buildingSearchBuilder.getTypes()[i] + "%'");
+//				}
+//			}
+//			sql.append(")");
+			sql.append(" and ( ");
+			String sqlType = Arrays.stream(buildingSearchBuilder.getTypes())
+							.map(item -> " b.type like '% "+item+"%'")
+							.collect(Collectors.joining(" OR "));
+			sql.append(sqlType);
 			sql.append(")");
 		}
 		// Tìm theo diện tích

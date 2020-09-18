@@ -2,11 +2,11 @@ package com.laptrinhjavaweb.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.laptrinhjavaweb.buider.BuildingSearchBuilder;
 import com.laptrinhjavaweb.converter.BuildingConverter;
 import com.laptrinhjavaweb.dto.BuildingDTO;
-import com.laptrinhjavaweb.dto.RentAreaDTO;
 import com.laptrinhjavaweb.entity.BuildingEntity;
 import com.laptrinhjavaweb.entity.RentAreaEntity;
 import com.laptrinhjavaweb.repository.IBuildingRepository;
@@ -23,12 +23,16 @@ public class BuildingServiceImpl implements IBuildingService {
 
 	@Override
 	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
-		List<BuildingDTO> results = new ArrayList<>();
+		/*List<BuildingDTO> results = new ArrayList<>();
 		List<BuildingEntity> buildingEntities = buildingRepository.getBuildings(buildingSearchBuilder);
 		for (BuildingEntity buildingEntity : buildingEntities) {
 			BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
 			results.add(buildingDTO);
 		}
+		return results; */
+		List<BuildingEntity> buildingEntities = buildingRepository.getBuildings(buildingSearchBuilder);
+		List<BuildingDTO> results = buildingEntities.stream().map(item -> buildingConverter.convertToDto(item))
+																.collect(Collectors.toList());
 		return results;
 	}
 
@@ -64,12 +68,16 @@ public class BuildingServiceImpl implements IBuildingService {
 
 	@Override
 	public List<BuildingDTO> findAll() {
-		List<BuildingDTO> results = new ArrayList<>();
+//		List<BuildingDTO> results = new ArrayList<>();
+//		List<BuildingEntity> buildingEntities = buildingRepository.findAll();
+//		for (BuildingEntity buildingEntity : buildingEntities) {
+//			BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
+//			results.add(buildingDTO);
+//		}
+//		return results;
 		List<BuildingEntity> buildingEntities = buildingRepository.findAll();
-		for (BuildingEntity buildingEntity : buildingEntities) {
-			BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
-			results.add(buildingDTO);
-		}
+		List<BuildingDTO> results = buildingEntities.stream().map(item -> buildingConverter.convertToDto(item))
+									.collect(Collectors.toList());
 		return results;
 	}
 
