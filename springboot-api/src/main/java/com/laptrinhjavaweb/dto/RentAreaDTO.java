@@ -1,9 +1,6 @@
 package com.laptrinhjavaweb.dto;
 
-import java.util.ArrayList;
 import java.util.Date;
-
-import com.laptrinhjavaweb.dto.BuildingDTO.BuildingDTOBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

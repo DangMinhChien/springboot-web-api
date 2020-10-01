@@ -1,6 +1,5 @@
 package com.laptrinhjavaweb.api;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import com.laptrinhjavaweb.buider.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.dto.BuildingTypeDTO;
 import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
-import com.laptrinhjavaweb.dto.input.UserInput;
 import com.laptrinhjavaweb.dto.output.UserOutput;
 import com.laptrinhjavaweb.emun.TypeBuilding;
 import com.laptrinhjavaweb.service.IAssignmentBuildingService;
@@ -156,7 +154,7 @@ public class BuildingAPI {
 	// Các nhân viên quản lý các tòa nhà
 	@GetMapping("/building/{buildingid}/staff")
 	public List<UserOutput> getUser(@PathVariable("buildingid") Long id , @RequestParam("role")  String role){
-		return userService.findAllUser(id, role);
+		return userService.findAllUserByBuilding(id, role);
 
 	}
 }

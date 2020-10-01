@@ -7,33 +7,32 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
-import com.laptrinhjavaweb.entity.AssignmentBuildingEntity;
-import com.laptrinhjavaweb.repository.IAssignmentBuildingRepository;
+import com.laptrinhjavaweb.dto.input.AssignmentCustomerInput;
+import com.laptrinhjavaweb.entity.AssignmentCustomerEntity;
+import com.laptrinhjavaweb.repository.IAssignmentCustomerRepository;
 
-public class AssignmentBuildingRepositoryImpl extends SimpleJpaRepository<AssignmentBuildingEntity> implements IAssignmentBuildingRepository {
-
+public class AssignmentCustomerRepositoryImpl extends SimpleJpaRepository<AssignmentCustomerEntity> implements IAssignmentCustomerRepository {
 	@Override
-	public Boolean assignmentBuilding(AssignmentBuildingInput assignmentBuildingInput) {
+	public Boolean assignmentCustomer(AssignmentCustomerInput assignmentCutomerInput) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 	try {
 		conn = EntityManagerFactory.getInstance().getConnection();
-		List<Long> oldUsers = getOldUsers(conn, assignmentBuildingInput.getBuildingId());
+		List<Long> oldUsers = getOldUsers(conn, assignmentCutomerInput.getCustomerId());
 		List<Long> newUsers = new ArrayList<>();
-		Long[] ids = assignmentBuildingInput.getStaffIds();
+		Long[] ids = assignmentCutomerInput.getStaff();
 		for (int i = 0; i < ids.length; i++) {
 			newUsers.add(ids[i]);
 		}
 		List<Long> checkedUsers = getIsCheckedUsers(oldUsers,newUsers);
 		List<Long> uncheckedUsers =getIsUncheckedUsers(oldUsers,newUsers);
 		if (!uncheckedUsers.isEmpty()) {
-			String sqlDelete = buildingSqlDelete(uncheckedUsers,assignmentBuildingInput.getBuildingId());
+			String sqlDelete = customerSqlDelete(uncheckedUsers,assignmentCutomerInput.getCustomerId());
 			stmt = conn.prepareStatement(sqlDelete);
 			stmt.executeUpdate();
 		}if (!checkedUsers.isEmpty()) {
-			String sqlInsert = buildingInsert(checkedUsers,assignmentBuildingInput.getBuildingId());
+			String sqlInsert = customerSqlDelete(checkedUsers,assignmentCutomerInput.getCustomerId());
 			stmt = conn.prepareStatement(sqlInsert);
 			stmt.executeUpdate();
 		}
@@ -62,19 +61,18 @@ public class AssignmentBuildingRepositoryImpl extends SimpleJpaRepository<Assign
 		return false;
 	}
 	}
-
-	private String buildingSqlDelete (List<Long> uncheckedUsers, Long buildingId) {
+	private String customerSqlDelete(List<Long> uncheckedUsers, Long customerId) {
 		StringBuilder values = new StringBuilder("");
 		for (Long item : uncheckedUsers) {
-			values.append(" DELETE FROM assignmentbuilding WHERE staffid="+item +" and buildingid ="+buildingId+" ;");
+			values.append(" DELETE FROM assignmentcustomer WHERE staffid="+item +" and customerid ="+customerId+" ;");
 		}
 		return values.toString();
 	}
 
-	private String buildingInsert (List<Long> checkedUsers, Long buildingId) {
+	private String customerSqlInsert(List<Long> checkedUsers, Long customerId) {
 		StringBuilder values = new StringBuilder("");
 		for (Long item : checkedUsers) {
-			values.append(" INSERT INTO assignmentbuilding(staffid,buildingid) VALUES("+item+","+buildingId+");\\n");
+			values.append(" INSERT INTO assignmentcustomer(staffid,customerid) VALUES("+item+","+customerId+");\\n");
 		}
 		return values.toString();
 	}
@@ -99,8 +97,8 @@ public class AssignmentBuildingRepositoryImpl extends SimpleJpaRepository<Assign
 		return result;
 	}
 
-	private List<Long> getOldUsers(Connection conn, Long buildingId)throws Exception {
-		String sql ="SELECT staffid FROM assignmentbuilding where buildingid ="+buildingId;
+	private List<Long> getOldUsers(Connection conn, Long customerId)throws Exception {
+		String sql ="SELECT staffid FROM assignmentcustomer where customerdd ="+customerId;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		List<Long> list = new ArrayList<Long>();
@@ -112,14 +110,14 @@ public class AssignmentBuildingRepositoryImpl extends SimpleJpaRepository<Assign
 		return list;
 	}
 	@Override
-	public Boolean isAssignmentbuilding(Long buildingId ,Long staffId) {
-		String sql = "SELECT * FROM assignmentbuilding where buildingid = " + buildingId + "and staffid= = " + staffId + "";
-		List<AssignmentBuildingEntity> result= this.findAll(sql);
+	public Boolean isAssignmentCustomer(Long customerId, Long staffId) {
+		String sql = "SELECT * FROM assignmentcustomer where customerid = " + customerId + "and staffid= = " + staffId + "";
+		List<AssignmentCustomerEntity> result= this.findAll(sql);
 		if (result.isEmpty()) {
 			return false;
 		}else {
 			return true;
 		}
-		
 	}
+
 }

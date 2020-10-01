@@ -1,25 +1,27 @@
 package com.laptrinhjavaweb.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.laptrinhjavaweb.converter.UserConverter;
 import com.laptrinhjavaweb.dto.output.UserOutput;
-import com.laptrinhjavaweb.entity.AssignmentBuildingEntity;
 import com.laptrinhjavaweb.entity.UserEntity;
 import com.laptrinhjavaweb.repository.IAssignmentBuildingRepository;
+import com.laptrinhjavaweb.repository.IAssignmentCustomerRepository;
 import com.laptrinhjavaweb.repository.IUserRepository;
 import com.laptrinhjavaweb.repository.impl.AssignmentBuildingRepositoryImpl;
+import com.laptrinhjavaweb.repository.impl.AssignmentCustomerRepositoryImpl;
 import com.laptrinhjavaweb.repository.impl.UserRepositoryImpl;
 import com.laptrinhjavaweb.service.IUserService;
 
 public class UserServiceImpl implements IUserService {
 	private IAssignmentBuildingRepository assignmentBuildingRepository = new AssignmentBuildingRepositoryImpl();
-	private IUserRepository userRepository= new UserRepositoryImpl();
+ 	private IAssignmentCustomerRepository assignmentCustomerRepository = new AssignmentCustomerRepositoryImpl();
+	private IUserRepository userRepository = new UserRepositoryImpl();
 	private UserConverter userConverter = new UserConverter();
+
 	@Override
-	public List<UserOutput> findAllUser(Long buildingId, String role) {
+	public List<UserOutput> findAllUserByBuilding(Long buildingId, String role) {
 //		List<UserOutput> result = new ArrayList<>();
 //		List<UserEntity> userAssignmentBuildings = userRepository.findUsersAssignmentByBuildingId(buildingId, role);
 		List<UserEntity> staffs = userRepository.findAllUser(role);
@@ -42,7 +44,20 @@ public class UserServiceImpl implements IUserService {
 //		}	
 		List<UserOutput> result = staffs.stream().map(item -> {
 			UserOutput output = userConverter.convertToDto(item);
-			if (assignmentBuildingRepository.isAssignmentbuilding(buildingId, output.getId()) == true) {				
+			if (assignmentBuildingRepository.isAssignmentbuilding(buildingId, output.getId()) == true) {
+				output.setChecked("checked");
+			}
+			return output;
+		}).collect(Collectors.toList());
+		return result;
+	}
+
+	@Override
+	public List<UserOutput> findAllUserByCustomer(Long customerId, String role) {
+		List<UserEntity> staffs = userRepository.findAllUser(role);
+		List<UserOutput> result = staffs.stream().map(item -> {
+			UserOutput output = userConverter.convertToDto(item);
+			if (assignmentCustomerRepository.isAssignmentCustomer(customerId, output.getId()) == true) {
 				output.setChecked("checked");
 			}
 			return output;
