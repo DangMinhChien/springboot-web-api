@@ -3,22 +3,33 @@ package com.laptrinhjavaweb.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.laptrinhjavaweb.converter.UserConverter;
 import com.laptrinhjavaweb.dto.output.UserOutput;
 import com.laptrinhjavaweb.entity.UserEntity;
-import com.laptrinhjavaweb.repository.IAssignmentBuildingRepository;
-import com.laptrinhjavaweb.repository.IAssignmentCustomerRepository;
-import com.laptrinhjavaweb.repository.IUserRepository;
 import com.laptrinhjavaweb.repository.impl.AssignmentBuildingRepositoryImpl;
 import com.laptrinhjavaweb.repository.impl.AssignmentCustomerRepositoryImpl;
 import com.laptrinhjavaweb.repository.impl.UserRepositoryImpl;
 import com.laptrinhjavaweb.service.IUserService;
-
+@Service
 public class UserServiceImpl implements IUserService {
-	private IAssignmentBuildingRepository assignmentBuildingRepository = new AssignmentBuildingRepositoryImpl();
- 	private IAssignmentCustomerRepository assignmentCustomerRepository = new AssignmentCustomerRepositoryImpl();
-	private IUserRepository userRepository = new UserRepositoryImpl();
-	private UserConverter userConverter = new UserConverter();
+	@Autowired
+	private AssignmentBuildingRepositoryImpl  assignmentBuildingRepository ;
+	@Autowired
+	private AssignmentCustomerRepositoryImpl  assignmentCustomerRepository ;
+	@Autowired
+	private UserRepositoryImpl  userRepository ;
+	@Autowired
+	private UserConverter  userConverter ;
+	
+//	@Autowired
+//	private TransactionConverter  transactionConvert ;
+//	private IAssignmentBuildingRepository assignmentBuildingRepository = new AssignmentBuildingRepositoryImpl();
+// 	private IAssignmentCustomerRepository assignmentCustomerRepository = new AssignmentCustomerRepositoryImpl();
+//	private IUserRepository userRepository = new UserRepositoryImpl();
+//	private UserConverter userConverter = new UserConverter();
 
 	@Override
 	public List<UserOutput> findAllUserByBuilding(Long buildingId, String role) {

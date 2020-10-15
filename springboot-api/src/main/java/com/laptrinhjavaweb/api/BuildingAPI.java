@@ -114,7 +114,7 @@ public class BuildingAPI {
 
 	// Sửa tòa nhà
 	@PutMapping("/buildings/")
-	public Boolean updateBuilding(@RequestBody BuildingDTO buidBuildingDTO) {
+	public BuildingDTO updateBuilding(@RequestBody BuildingDTO buidBuildingDTO) {
 		return buidingService.update(buidBuildingDTO);
 	}
 
