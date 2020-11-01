@@ -2,6 +2,10 @@ package com.laptrinhjavaweb.dto;
 
 public class NewDTO extends AbstractDTO<NewDTO> {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6776259550904362849L;
 	private String title;
 	private String thumbnail;
 	private String shortDescription;

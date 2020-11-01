@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BuildingDTO {
+public class BuildingDTO  extends AbstractDTO<BuildingDTO>{
 	
-private Long id;
 private String name ;
 private Integer numberOfBasement;
 private Integer floorArea;
@@ -40,10 +39,6 @@ private String note;
 private String linkBuilding;
 private String map;
 private String avatar;
-private Date createdDate ;
-private Date modifiedDate ;
-private String createdBy ;
-private String modifiedBy ;
 private String rentArea;
 private Integer rentAreaFrom;
 private Integer rentAreaTo;

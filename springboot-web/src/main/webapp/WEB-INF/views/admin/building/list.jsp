@@ -1,5 +1,6 @@
 <%@include file="/common/taglib.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<c:url var="buildingListURL" value="/admin/building-list"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,18 +43,18 @@
 								
 								<div class="widget-body">
 								<div class="widget-main">
-								<form class="form-horizontal">
+								<form:form commandName="modelSearch" action="buildingListURL" id="listForm" method="GET" class="form-horizontal">
 								<div class="form-group mb">
 								<div class="col-sm-6">
 										<div>
 											<label for="name" class="bold">Tên tòa nhà</label>
-											<input type="text" id="name" class="form-control" />
+											<form:input path="name" cssClass="form-control" />
 										</div>
 									</div>
 									<div class=" col-sm-6">
 										<div>
-											<label for="buildingArea" class="bold">Diện tích sàn</label>
-											<input type="number" id="buildingArea" class="form-control" />
+											<label for="floorArea" class="bold">Diện tích sàn</label>
+											<form:input type="number" path="floorArea" cssClass="form-control" />
 										</div>
 									
 									</div>
@@ -62,13 +63,10 @@
 								<div class="col-sm-2">
 										<div>
 											<label for="district" class="bold">Quận hiện có</label>
-											<select id="district">
-											<option>-- Chọn quận--</option>
-											<option>1</option>
-											<option>2</option>
-											<option>3</option>
-											<option>4</option>
-										  </select>
+											<form:select path="district" id="district">
+												<form:option value="" label="-- Chọn quận--"/>
+												<form:options items="${districts}"/>
+										  </form:select>
 										</div>
 									</div>
 									<div class=" col-sm-2">
@@ -76,14 +74,14 @@
 									<div class=" col-sm-4">
 										<div>
 											<label for="ward" class="bold">Phường</label>
-											<input type="text" id="ward" class="form-control" />
+											<form:input path="ward" cssClass="form-control" />
 										</div>
 									
 									</div>
 									<div class=" col-sm-4">
 										<div>
 											<label for="street" class="bold">Đường</label>
-											<input type="text" id="street" class="form-control" />
+											<form:input path="street" cssClass="form-control" />
 										</div>
 									
 									</div>
@@ -92,82 +90,77 @@
 								<div class="col-sm-4">
 										<div>
 											<label for="numberOfBasement" class="bold">Số tầng hầm</label>
-											<input type="text" id="" class="form-control" />
+											<form:input path="numberOfBasement" cssClass="form-control" />
 										</div>
 									</div>
 									<div class=" col-sm-4">
 										<div>
 											<label for="direction" class="bold">Hướng</label>
-											<input type="text" id="direction" class="form-control" />
+											<form:input path="direction" cssClass="form-control" />
 										</div>
 									
 									</div>
 									<div class="col-sm-4">
 										<div>
-											<label for="rank" class="bold">Hạng</label>
-											<input type="text" id="rank" class="form-control" />
+											<label for="level" class="bold">Hạng</label>
+											<form:input path="level" cssClass="form-control" />
 										</div>
 									</div>
 								</div>
 								<div class="form-group mb">
 								<div class="col-sm-3">
 										<div>
-											<label for="areaRentForm" class="bold">Diện tích từ</label>
-											<input type="number" id="areaRentForm" class="form-control" />
+											<label for="rentAreaFrom" class="bold">Diện tích từ</label>
+											<form:input type="number" path="rentAreaFrom" cssClass="form-control" />
 										</div>
 									</div>
 									<div class=" col-sm-3">
 										<div>
-											<label for="areaRentTo" class="bold">Diện tích đến</label>
-											<input type="number" id="areaRentTo" class="form-control" />
+											<label for="rentAreaTo" class="bold">Diện tích đến</label>
+											<form:input type="number" path="rentAreaTo" cssClass="form-control" />
 										</div>
 									
 									</div>
 									<div class="col-sm-3">
 										<div>
-											<label for="costRentForm" class="bold">Giá thuê từ</label>
-											<input type="number" id="costRentForm" class="form-control" />
+											<label for="rentPriceFrom" class="bold">Giá thuê từ</label>
+											<form:input type="number" path="rentPriceFrom" cssClass="form-control" />
 										</div>
 									</div>
 									<div class="col-sm-3">
 										<div>
-											<label for="costRentTo" class="bold">Giá thuê đến</label>
-											<input type="number" id="costRentTo" class="form-control" />
+											<label for="rentPriceTo" class="bold">Giá thuê đến</label>
+											<form:input type="number" path="rentPriceTo" cssClass="form-control" />
 										</div>
 									</div>
 								</div>
 								<div class="form-group mb">
 								<div class="col-sm-4">
 										<div>
-											<label for="nameAdmin" class="bold">Tên quản lý</label>
-											<input type="text" id="nameAdmin" class="form-control" />
+											<label for="manager" class="bold">Tên quản lý</label>
+											<form:input path="manager" cssClass="form-control" />
 										</div>
 									</div>
 									<div class=" col-sm-4">
 										<div>
-											<label for="phone" class="bold">Điện thoại quản lý</label>
-											<input type="text" id="phone" class="form-control" />
+											<label for="managerMobile" class="bold">Điện thoại quản lý</label>
+											<form:input path="managerMobile" cssClass="form-control" />
 										</div>
 									
 									</div>
 									<div class="col-sm-3">
 										<div>
-											<label for="staff" class="bold">Chọn nhân viên phụ trách</label>
-											<select id="staff">
-											<option>-- Chọn nhân viên phụ trách--</option>
-											<option>1</option>
-											<option>2</option>
-											<option>3</option>
-											<option>4</option>
-										  </select>
+											<label for="staffId" class="bold">Chọn nhân viên phụ trách</label>
+										  <form:select path="staffId" >
+												<form:option value="-1" label="-- Chọn nhân viên phụ trách--"/>
+												<form:options items="${staff}"/>
+										  </form:select>
 										</div>
 									</div>
 								</div>
 								<div class="form-group mb">
 								<div class="col-sm-12">
-									<label class="checkbox-inline bold"><input type="checkbox" value="">Tầng trệt</label>
-									<label class="checkbox-inline bold"><input type="checkbox" value="">Nguyên căn</label>
-									<label class="checkbox-inline bold"><input type="checkbox" value="">Nội thất</label>
+									<form:checkboxes path="types" items=${buildingTypes}/>
 									</div>
 								</div>
 								<div class="form-group mb">
@@ -175,7 +168,7 @@
 									<button type="button" class="btn btn-success">Tìm kiếm</button>
 									</div>
 								</div>
-								</form>
+								</form:form>
 								</div>
 								</div>
 							</div>	
@@ -215,12 +208,13 @@
 								</tr>
 							</thead>
 							<tbody>
+							<c:forEach var="item" items="${buildings}">
 								<tr>
 									<td class="center">                                 
-										<label><input type="checkbox" value="1"></label>
+										<label><input type="checkbox" value="${item.id}" id="checkbox_${item.id}"></label>
 									</td>
-									<td></td>
-									<td>Người vô tình</td>
+									<td>${item.name}</td>
+									<td>${item.street}</td>
 									<td></td>
 									<td></td>
 									<td></td>
@@ -239,32 +233,8 @@
 									<button class="btn btn-xs btn-info">
 											<i class="fa fa-plus" data-toggle="tooltip" title="Giao tòa nhà" ></i>
 										</button></td>
-								</tr>	
-								<tr>
-									<td class="center">                                 
-										<label><input type="checkbox" value="2"></label>
-									</td>
-									<td></td>
-									<td>Người thất tình</td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td><a class="btn btn-xs btn-info" >
-											<i class="fa fa-eye" data-toggle="tooltip" title="Xem chi tiết tòa nhà" ></i>
-										</a>
-										<a class="btn btn-xs btn-info" >
-											<i class="fa fa-pencil-square-o" data-toggle="tooltip" title="Sửa chi tiết tòa nhà" ></i>
-										</a>
-									<button class="btn btn-xs btn-info" onclick="assignmentBuilding(1)">
-											<i class="fa fa-bars" data-toggle="tooltip" title="Giao tòa nhà" ></i>
-										</button>
-									<button class="btn btn-xs btn-info">
-											<i class="fa fa-plus" data-toggle="tooltip" title="Giao tòa nhà" ></i>
-										</button></td>
-								</tr>	
+								</tr>
+							</c:forEach>	
 							</tbody>
 							</table>
 							</div>	
