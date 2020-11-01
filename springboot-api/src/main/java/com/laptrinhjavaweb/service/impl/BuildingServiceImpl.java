@@ -12,18 +12,17 @@ import com.laptrinhjavaweb.converter.BuildingConverter;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.entity.BuildingEntity;
 import com.laptrinhjavaweb.entity.RentAreaEntity;
-import com.laptrinhjavaweb.repository.impl.AssignmentBuildingRepositoryImpl;
-import com.laptrinhjavaweb.repository.impl.BuildingRepositoryImpl;
-import com.laptrinhjavaweb.repository.impl.RentAreaRepositoryImpl;
+import com.laptrinhjavaweb.repository.IBuildingRepository;
+import com.laptrinhjavaweb.repository.IRentAreaRepository;
 import com.laptrinhjavaweb.service.IBuildingService;
 @Service
 public class BuildingServiceImpl implements IBuildingService {
 	@Autowired
-	private BuildingRepositoryImpl  buildingRepository ;
+	private IBuildingRepository  buildingRepository ;
 	@Autowired
-	private RentAreaRepositoryImpl  rentAreaRepository ;
-	@Autowired
-	private AssignmentBuildingRepositoryImpl  assignmentBuildingRepository ;
+	private IRentAreaRepository  rentAreaRepository ;
+//	@Autowired
+//	private AssignmentBuildingRepositoryImpl  assignmentBuildingRepository ;
 	@Autowired
 	private BuildingConverter  buildingConverter ;
 
@@ -46,7 +45,7 @@ public class BuildingServiceImpl implements IBuildingService {
 																.collect(Collectors.toList());
 		return results;
 	}
-
+	@Transactional
 	@Override
 	public BuildingDTO save(BuildingDTO buildingDTO) {
 //		Long buildingId =  buildingRepository.save(buildingDTO);
@@ -63,7 +62,8 @@ public class BuildingServiceImpl implements IBuildingService {
 		BuildingEntity buildingEntity = buildingConverter.convertToEntity(buildingDTO);
 		String types = buildingDTO.getTypes().stream().map(item -> item).collect(Collectors.joining(" , "));
 		buildingEntity.setTypes(types);
-		Long id = buildingRepository.save(buildingEntity);
+		buildingEntity = buildingRepository.save(buildingEntity);
+		
 		if (buildingDTO.getRentArea() != null && !buildingDTO.getRentArea().isEmpty()) {
 			String rentArea = buildingDTO.getRentArea();
 			String[] valueRentArea = rentArea.split(",");
@@ -71,12 +71,11 @@ public class BuildingServiceImpl implements IBuildingService {
 			for (String value : valueRentArea) {
 				RentAreaEntity rentAreaEntity = new RentAreaEntity();
 				rentAreaEntity.setValue(Integer.parseInt(value));
-				rentAreaEntity.setBuildingId(id);
+				rentAreaEntity.setBuilding(buildingEntity);
 				rentAreaRepository.save(rentAreaEntity);
 			}
 		}
-		
-		BuildingDTO dto = buildingConverter.convertToDto(buildingRepository.findById(id));
+		BuildingDTO dto = buildingConverter.convertToDto(buildingEntity);
 		return dto;
 	}
 
@@ -98,33 +97,31 @@ public class BuildingServiceImpl implements IBuildingService {
 	@Override
 	public BuildingDTO update(BuildingDTO buildingDTO) {
 		BuildingEntity updatebuilding = buildingConverter.convertToEntity(buildingDTO);
-		BuildingEntity oldbuilding = buildingRepository.findById(buildingDTO.getId());
+		BuildingEntity oldbuilding = buildingRepository.findOne(buildingDTO.getId());
 		updatebuilding.setModifiedBy(oldbuilding.getModifiedBy());
 		updatebuilding.setModifiedDate(oldbuilding.getModifiedDate());
-		String sql = "DELTE FROM rentare WHERE buildingId = "+ buildingDTO.getId()+"";
-		rentAreaRepository.delete(sql);
+		//String sql = "DELTE FROM rentare WHERE buildingId = "+ buildingDTO.getId()+"";
+		rentAreaRepository.deleteByBuildingEntityId(buildingDTO.getId());
 		String rentArea = buildingDTO.getRentArea();
 		String[] valueRentArea = rentArea.split(",");
 		// Insert RentArea
 		for (String value : valueRentArea) {
 			RentAreaEntity rentAreaEntity = new RentAreaEntity();
 			rentAreaEntity.setValue(Integer.parseInt(value));
-			rentAreaEntity.setBuildingId(buildingDTO.getId());
+			rentAreaEntity.setBuilding(updatebuilding);
 			rentAreaRepository.save(rentAreaEntity);
 		}
 		String types = buildingDTO.getTypes().stream().map(item -> item).collect(Collectors.joining(" , "));
 		updatebuilding.setTypes(types);
-		buildingRepository.update(updatebuilding);
+		buildingRepository.save(updatebuilding);
 		return buildingDTO;
 	}
 	@Transactional
 	@Override
 	public void delete(long[] ids) {
 		for (long item : ids) {
-			String sqlRentArea = "DELTE FROM rentare WHERE buildingId = "+ item+"";
-			rentAreaRepository.delete(sqlRentArea);
-			String sqlAssignment = "DELTE FROM assignmentbuilding WHERE buildingId = "+ item+"";
-			assignmentBuildingRepository.delete(sqlAssignment);
+			rentAreaRepository.deleteByBuildingEntityId(item);
+			buildingRepository.deleteAssignmentByIdNative(item);
 			buildingRepository.delete(item);
 			}
 		}

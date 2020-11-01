@@ -1,19 +1,24 @@
 package com.laptrinhjavaweb.entity;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.laptrinhjavaweb.annotations.Column;
-import com.laptrinhjavaweb.annotations.Table;
-
-import lombok.Data;
-
-@Data
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+@Entity
 @Table(name = "customer")
-public class CustomerEntity {
-	@Column(name = "id")
-	private Long id;
-	
+public class CustomerEntity extends BaseEntity{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1547526104290208219L;
+
 	@Column(name = "username")
 	private String userName;
 	
@@ -26,15 +31,55 @@ public class CustomerEntity {
 	@Column(name = "email")
 	private String email;
 	
-	@Column(name = "createddate")
-	private Date createdDate;
+	@ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "assignmentcustomer",
+            joinColumns = @JoinColumn(name = "customer_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
+    private List<UserEntity> userCustomer = new ArrayList<>();
+
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transaction")
+    private TransactionEntity transaction;
 	
-	@Column(name = "modifieddate")
-	private Date modifiedDate;
+	public List<UserEntity> getUserCustomer() {
+		return userCustomer;
+	}
+
+	public void setUserCustomer(List<UserEntity> userCustomer) {
+		this.userCustomer = userCustomer;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	
-	@Column(name = "createdby")
-	private String createdBy;
 	
-	@Column(name = "modifiedby")
-	private String modifiedBy;
 }

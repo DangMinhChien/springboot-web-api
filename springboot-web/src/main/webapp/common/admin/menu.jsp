@@ -38,7 +38,7 @@
             <a href="#" class="dropdown-toggle">
                 <i class="menu-icon fa fa-list"></i>
                 <span class="menu-text"></span>
-                Quản lý bài viết
+                Quản lý tòa nhà
                 <b class="arrow fa fa-angle-down"></b>
             </a>
             <b class="arrow"></b>
@@ -46,7 +46,7 @@
                 <li>
                     <a href="<c:url value='/admin/new-list?page=1&limit=2'/>">
                         <i class="menu-icon fa fa-caret-right"></i>
-                        DS bài viết
+                        Danh sách tòa nhà
                     </a>
                     <b class="arrow"></b>
                 </li>
