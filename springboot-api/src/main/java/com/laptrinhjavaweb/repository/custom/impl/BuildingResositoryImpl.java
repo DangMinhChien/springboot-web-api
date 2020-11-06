@@ -86,12 +86,12 @@ public class BuildingResositoryImpl implements BuildingReponsitoryCustom {
 					String fieldType = field.getType().getName();
 					if (fieldType.equals("java.lang.String")) {
 						if (field.get(buildingSearchBuilder) != null) {
-							sql.append(" and b" + field.getName().toLowerCase() + " like '%"
+							sql.append(" and b." + field.getName().toLowerCase() + " like '%"
 									+ field.get(buildingSearchBuilder) + "%'");
 						}
 					} else if (fieldType.equals("java.lang.Integer")) {
 						if (field.get(buildingSearchBuilder) != null) {
-							sql.append("and b" + field.getName().toLowerCase() + " = '%"
+							sql.append("and b." + field.getName().toLowerCase() + " = '%"
 									+ field.get(buildingSearchBuilder) + "%'");
 						}
 					}

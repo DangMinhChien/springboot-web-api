@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -43,11 +44,10 @@ public class CustomerEntity extends BaseEntity{
     @JoinTable(name = "assignmentcustomer",
             joinColumns = @JoinColumn(name = "customer_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
-    private List<UserEntity> userCustomer = new ArrayList<>();
+    private List<UserEntity> user = new ArrayList<>();
 
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction")
-    private TransactionEntity transaction;
+	@OneToMany(mappedBy = "transaction")
+	private List<TransactionEntity> transaction = new ArrayList<>();
 	
 //	@Column(name = "id")
 //	private Long id;

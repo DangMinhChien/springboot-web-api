@@ -6,33 +6,36 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.laptrinhjavaweb.buider.BuildingSearchBuilder;
 import com.laptrinhjavaweb.dto.BuildingDTO;
 import com.laptrinhjavaweb.dto.BuildingTypeDTO;
-//import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
-//import com.laptrinhjavaweb.dto.output.UserOutput;
+import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
+import com.laptrinhjavaweb.dto.output.UserOutput;
 import com.laptrinhjavaweb.emun.TypeBuilding;
-//import com.laptrinhjavaweb.service.IAssignmentBuildingService;
 import com.laptrinhjavaweb.service.IBuildingService;
-//import com.laptrinhjavaweb.service.IUserService;
-//import com.laptrinhjavaweb.service.impl.AssignmentBuildingServiceImpl;
-import com.laptrinhjavaweb.service.impl.BuildingServiceImpl;
-//import com.laptrinhjavaweb.service.impl.UserServiceImpl;
+import com.laptrinhjavaweb.service.IUserService;
 
 @RestController
 public class BuildingAPI {
-	private IBuildingService buidingService = new BuildingServiceImpl();
+//	private IBuildingService buidingService = new BuildingServiceImpl();
 //	private IAssignmentBuildingService assignmentBuildingService = new AssignmentBuildingServiceImpl();
 //	private IUserService userService = new UserServiceImpl();
-
+	
+	@Autowired
+	IBuildingService buidingService ;
+	
+	@Autowired
+	IUserService userService ;
+	
 // Phương thức get search
 	@GetMapping("/buildings")
 	public List<BuildingDTO> getBuildings(@RequestParam Map<String, String> requestParams,
@@ -123,11 +126,12 @@ public class BuildingAPI {
 		buidingService.delete(ids);
 	}
 
-//	// Giao tòa nhà cho nhân viên
-//	@PostMapping("/building/assignment")
-//	public Boolean assignmentBuilding(@RequestBody AssignmentBuildingInput assignmentBuildingInput) {
+	// Giao tòa nhà cho nhân viên
+	@PostMapping("/building/assignment")
+	public void assignmentBuilding(@RequestBody AssignmentBuildingInput assignmentBuildingInput) {
+		buidingService.assignmentBuilding(assignmentBuildingInput);
 //		return assignmentBuildingService.assignmentBuilding(assignmentBuildingInput);
-//	}
+	}
 
 	// Danh sách loại tòa nhà
 	@GetMapping("/building-type")
@@ -151,9 +155,9 @@ public class BuildingAPI {
 	}
 
 //	// Các nhân viên quản lý các tòa nhà
-//	@GetMapping("/building/{buildingid}/staff")
-//	public List<UserOutput> getUser(@PathVariable("buildingid") Long id , @RequestParam("role")  String role){
-//		return userService.findAllUserByBuilding(id, role);
-//
-//	}
+	@GetMapping("/building/{buildingid}/staff")
+	public List<UserOutput> getUser(@PathVariable("buildingid") Long id){
+		return userService.findAllUserByBuilding(id, "STAFF");
+
+	}
 }

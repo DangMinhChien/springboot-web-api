@@ -1,83 +1,103 @@
-//package com.laptrinhjavaweb.service.impl;
+package com.laptrinhjavaweb.service.impl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 //
 //import java.util.List;
 //import java.util.stream.Collectors;
 //
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import com.laptrinhjavaweb.converter.CustomerConverter;
-//import com.laptrinhjavaweb.dto.CustomerDTO;
-//import com.laptrinhjavaweb.dto.input.CustomerDetailInput;
-//import com.laptrinhjavaweb.dto.output.CustomerDetailOutput;
-//import com.laptrinhjavaweb.entity.CustomerEntity;
-//import com.laptrinhjavaweb.entity.TransactionEntity;
-//import com.laptrinhjavaweb.entity.UserEntity;
-//import com.laptrinhjavaweb.repository.impl.AssignmentCustomerRepositoryImpl;
-//import com.laptrinhjavaweb.repository.impl.CustomerRepositoryImpl;
-//import com.laptrinhjavaweb.repository.impl.TransactionRepositoryImpl;
-//import com.laptrinhjavaweb.repository.impl.UserRepositoryImpl;
-//import com.laptrinhjavaweb.service.ICustomerService;
-//@Service
-//public class CustomerServiceImpl implements ICustomerService {
-//	@Autowired
-//	private UserRepositoryImpl  userRepository ;
-//	@Autowired
-//	private TransactionRepositoryImpl  transactionRepository ;
-//	@Autowired
-//	private CustomerRepositoryImpl  customerRepository ;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.laptrinhjavaweb.buider.CustomerSearchBuilder;
+import com.laptrinhjavaweb.converter.CustomerConverter;
+import com.laptrinhjavaweb.dto.CustomerDTO;
+import com.laptrinhjavaweb.dto.input.AssignmentCustomerInput;
+import com.laptrinhjavaweb.dto.input.CustomerDetailInput;
+import com.laptrinhjavaweb.dto.output.CustomerDetailOutput;
+import com.laptrinhjavaweb.entity.CustomerEntity;
+import com.laptrinhjavaweb.entity.TransactionEntity;
+import com.laptrinhjavaweb.entity.UserEntity;
+import com.laptrinhjavaweb.repository.ICustomerRepository;
+import com.laptrinhjavaweb.repository.ITransactionRepository;
+import com.laptrinhjavaweb.repository.IUserRepository;
+import com.laptrinhjavaweb.service.ICustomerService;
+@Service
+public class CustomerServiceImpl implements ICustomerService {
+	
+	@Autowired
+	private IUserRepository  userRepository ;
+	
+	@Autowired
+	private ITransactionRepository  transactionRepository ;
+	
+////@Autowired
+////private TransactionConverter  transactionConvert ;
+
 //	@Autowired
 //	private AssignmentCustomerRepositoryImpl  assignmentCustomerRepository ;
-//	@Autowired
-//	private CustomerConverter  customerConverter ;
-////	@Autowired
-////	private TransactionConverter  transactionConvert ;
-//	
-////	private IUserRepository userRepository = new UserRepositoryImpl();
-////	private ITransactionRepository transactionRepository = new TransactionRepositoryImpl();
-////	private ICustomerRepository customerRepository = new CustomerRepositoryImpl();
-////	private IAssignmentCustomerRepository assignmentCustomerRepository = new AssignmentCustomerRepositoryImpl();
-////	private CustomerConverter customerConverter = new CustomerConverter();
-////	private TransactionConverter transactionConvert = new TransactionConverter();
-//	@Transactional
-//	@Override
-//	public CustomerDetailOutput getCustomerDetail(CustomerDetailInput customerDetailInput) {
-//		List<TransactionEntity> listTransactionCSKH = transactionRepository.getTransactionByCustomerIdByCustomerCare(customerDetailInput.getCustomerId());
-//		List<TransactionEntity> listTransactionGO = transactionRepository.getTransactionByCustomerIdByGoandsee(customerDetailInput.getCustomerId());
-//		UserEntity userEntity = userRepository.findById(customerDetailInput.getCustomerId());
-////		List<TransactionDTO> results = transactionEntities.stream().map(item -> transactionConvert.convertToDto(item))
-////				.collect(Collectors.toList());
-//		List<String> noteCareCustomer = listTransactionCSKH.stream().map(item ->{
-//			return item.getNote();
-//		}).collect(Collectors.toList());
-//		
-//		List<String> noteGotosee = listTransactionGO.stream().map(item ->{
-//			return item.getNote();
-//		}).collect(Collectors.toList());
-//		
-//		CustomerDetailOutput customerDetailOutput = new CustomerDetailOutput();
-//		customerDetailOutput.setUserName(userEntity.getFullName());
-//		customerDetailOutput.setCareCustomer(noteCareCustomer);
-//		customerDetailOutput.setGoAndSee(noteGotosee);
-//		return customerDetailOutput;
-//	}
-//	@Override
-//	public CustomerDTO save(CustomerDTO customerDTO) {
-//		CustomerEntity customerEntity = customerConverter.convertToEntity(customerDTO);
-//		Long id = customerRepository.save(customerEntity);
-//		CustomerDTO dto = customerConverter.convertToDto(customerRepository.findById(id));
-//		return dto;
-//	}
-//	@Override
-//	public CustomerDTO update(CustomerDTO customerDTO) {
-//		CustomerEntity updatecustomer = customerConverter.convertToEntity(customerDTO);
-//		CustomerEntity oldcustomer = customerRepository.findById(customerDTO.getId());
-//		updatecustomer.setModifiedBy(oldcustomer.getModifiedBy());
-//		updatecustomer.setModifiedDate(oldcustomer.getModifiedDate());
-//		customerRepository.update(updatecustomer);
-//		return customerDTO;
-//	}
+	
+	@Autowired
+	private CustomerConverter  customerConverter ;
+	
+	@Autowired
+	private ICustomerRepository  customerRepository ;
+	
+////private IUserRepository userRepository = new UserRepositoryImpl();
+////private ITransactionRepository transactionRepository = new TransactionRepositoryImpl();
+////private ICustomerRepository customerRepository = new CustomerRepositoryImpl();
+////private IAssignmentCustomerRepository assignmentCustomerRepository = new AssignmentCustomerRepositoryImpl();
+////private CustomerConverter customerConverter = new CustomerConverter();
+////private TransactionConverter transactionConvert = new TransactionConverter();
+	
+	@Override
+	public List<CustomerDTO> getCustomers(CustomerSearchBuilder customerSearchBuilder) {
+		List<CustomerEntity> customerEntities = customerRepository.getCustomers(customerSearchBuilder);
+		List<CustomerDTO> results = customerEntities.stream().map(item -> customerConverter.convertToDto(item))
+				.collect(Collectors.toList());
+		return results;
+	}
+
+	@Transactional
+	@Override
+	public CustomerDetailOutput getCustomerDetail(CustomerDetailInput customerDetailInput) {
+		List<TransactionEntity> listTransactionCSKH = transactionRepository.findByCodeAndCustomer_Id("QUA_TRINH_CSKH", customerDetailInput.getCustomerId());
+		List<TransactionEntity> listTransactionGO = transactionRepository.findByCodeAndCustomer_Id("DAN_DI_XEM", customerDetailInput.getCustomerId());
+		UserEntity userEntity = userRepository.findOne(customerDetailInput.getCustomerId());
+//		List<TransactionDTO> results = transactionEntities.stream().map(item -> transactionConvert.convertToDto(item))
+//				.collect(Collectors.toList());
+		List<String> noteCareCustomer = listTransactionCSKH.stream().map(item ->{
+			return item.getNote();
+		}).collect(Collectors.toList());
+		
+		List<String> noteGotosee = listTransactionGO.stream().map(item ->{
+			return item.getNote();
+		}).collect(Collectors.toList());
+		
+		CustomerDetailOutput customerDetailOutput = new CustomerDetailOutput();
+		customerDetailOutput.setUserName(userEntity.getFullName());
+		customerDetailOutput.setCareCustomer(noteCareCustomer);
+		customerDetailOutput.setGoAndSee(noteGotosee);
+		return customerDetailOutput;
+	}
+	@Override
+	public CustomerDTO save(CustomerDTO customerDTO) {
+		CustomerEntity customerEntity = customerConverter.convertToEntity(customerDTO);
+		customerEntity = customerRepository.save(customerEntity);
+		CustomerDTO dto = customerConverter.convertToDto(customerEntity);
+		return dto;
+	}
+	@Override
+	public CustomerDTO update(CustomerDTO customerDTO) {
+		CustomerEntity updatecustomer = customerConverter.convertToEntity(customerDTO);
+		CustomerEntity oldcustomer = customerRepository.findOne(customerDTO.getId());
+		updatecustomer.setModifiedBy(oldcustomer.getModifiedBy());
+		updatecustomer.setModifiedDate(oldcustomer.getModifiedDate());
+		customerRepository.save(updatecustomer);
+		return customerDTO;
+	}
 //	@Override
 //	public List<CustomerDTO> findAll() {
 //		List<CustomerEntity> customerEntities = customerRepository.findAll();
@@ -85,17 +105,70 @@
 //									.collect(Collectors.toList());
 //		return results;
 //	}
-//	@Override
-//	public void delete(long[] ids) {
-//		for (long item : ids) {
+	@Override
+	public void delete(long[] ids) {
+		for (long id : ids) {
 //			String sqlTransaction = "DELTE FROM transaction WHERE customerId = "+ item+"";
 //			transactionRepository.delete(sqlTransaction);
 //			String sqlAssignment = "DELTE FROM assignmentcustomer WHERE customerId = "+ item+"";
 //			assignmentCustomerRepository.delete(sqlAssignment);
-//			customerRepository.delete(item);
-//			}
-//	}
-//	
-//	
-//
-//}
+			List<TransactionEntity> transactionEntities = transactionRepository.findByCustomer_Id(id);
+			for (TransactionEntity transactionEntity : transactionEntities) {
+				transactionRepository.delete(transactionEntity);
+			}
+			customerRepository.deleteAssignmentCustomerByIdNative(id);
+			customerRepository.delete(id);
+			}
+	}
+
+	@Transactional
+	@Override
+	public void assignmentCustomer(AssignmentCustomerInput assignmentCustomerInput	) {
+		List<UserEntity> userEntities = userRepository
+				.findByUsersCustomer_IdAndRole_Id(assignmentCustomerInput.getCustomerId(), "staff");
+		List<Long> oldUsers = new ArrayList<>();
+		for (UserEntity userEntity : userEntities) {
+			oldUsers.add(userEntity.getId());
+		}
+		List<Long> newUsers = new ArrayList<>();
+		Long[] ids = assignmentCustomerInput.getStaff();
+		for (int i = 0; i < ids.length; i++) {
+			newUsers.add(ids[i]);
+		}
+		List<Long> checkedUsers = getIsCheckedUsers(oldUsers, newUsers);
+		List<Long> uncheckedUsers = getIsUncheckedUsers(oldUsers, newUsers);
+		if (!uncheckedUsers.isEmpty()) {
+			for (Long staffId : uncheckedUsers) {
+				customerRepository.deleteAssignmentByCustomerIdAndStaffIdNative(assignmentCustomerInput.getCustomerId(), staffId);
+			}
+		}
+		if (!checkedUsers.isEmpty()) {
+			for (Long staffId : checkedUsers) {
+				customerRepository.insertAssignment(assignmentCustomerInput.getCustomerId(), staffId);
+			}
+		}
+	}
+
+	private List<Long> getIsCheckedUsers(List<Long> oldUsers, List<Long> newUsers) {
+		List<Long> result = new ArrayList<>();
+		for (Long newobj : newUsers) {
+			if (!oldUsers.contains(newobj)) {
+				result.add(newobj);
+			}
+		}
+		return result;
+	}
+
+	private List<Long> getIsUncheckedUsers(List<Long> oldUsers, List<Long> newUsers) {
+		List<Long> result = new ArrayList<>();
+		for (Long oldobj : oldUsers) {
+			if (!newUsers.contains(oldobj)) {
+				result.add(oldobj);
+			}
+		}
+		return result;
+	}
+	
+	
+
+}

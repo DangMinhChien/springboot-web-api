@@ -108,18 +108,18 @@ public class BuildingEntity extends BaseEntity {
 	private String avatar;
 	
 	public List<UserEntity> getUsers() {
-		return userBulding;
+		return user;
 	}
 
 	public void setUsers(List<UserEntity> users) {
-		this.userBulding = users;
+		this.user = users;
 	}
 
 	@ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "assignmentbuilding",
             joinColumns = @JoinColumn(name = "bulding_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
-    private List<UserEntity> userBulding = new ArrayList<>();
+    private List<UserEntity> user = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "building")
 	private List<RentAreaEntity> rentArea = new ArrayList<>();

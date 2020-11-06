@@ -1,5 +1,6 @@
 package com.laptrinhjavaweb.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,21 +11,29 @@ import org.springframework.transaction.annotation.Transactional;
 import com.laptrinhjavaweb.buider.BuildingSearchBuilder;
 import com.laptrinhjavaweb.converter.BuildingConverter;
 import com.laptrinhjavaweb.dto.BuildingDTO;
+import com.laptrinhjavaweb.dto.input.AssignmentBuildingInput;
 import com.laptrinhjavaweb.entity.BuildingEntity;
 import com.laptrinhjavaweb.entity.RentAreaEntity;
+import com.laptrinhjavaweb.entity.UserEntity;
 import com.laptrinhjavaweb.repository.IBuildingRepository;
 import com.laptrinhjavaweb.repository.IRentAreaRepository;
+import com.laptrinhjavaweb.repository.IUserRepository;
 import com.laptrinhjavaweb.service.IBuildingService;
+
 @Service
 public class BuildingServiceImpl implements IBuildingService {
 	@Autowired
-	private IBuildingRepository  buildingRepository ;
+	private IBuildingRepository buildingRepository;
 	@Autowired
-	private IRentAreaRepository  rentAreaRepository ;
+	private IRentAreaRepository rentAreaRepository;
+
+	@Autowired
+	private IUserRepository userRepository;
+
 //	@Autowired
 //	private AssignmentBuildingRepositoryImpl  assignmentBuildingRepository ;
 	@Autowired
-	private BuildingConverter  buildingConverter ;
+	private BuildingConverter buildingConverter;
 
 //	private IBuildingRepository buildingRepository = new BuildingRepositoryImpl();
 //	private IRentAreaRepository rentAreaRepository = new RentAreaRepositoryImpl();
@@ -33,18 +42,19 @@ public class BuildingServiceImpl implements IBuildingService {
 
 	@Override
 	public List<BuildingDTO> getBuildings(BuildingSearchBuilder buildingSearchBuilder) {
-		/*List<BuildingDTO> results = new ArrayList<>();
-		List<BuildingEntity> buildingEntities = buildingRepository.getBuildings(buildingSearchBuilder);
-		for (BuildingEntity buildingEntity : buildingEntities) {
-			BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
-			results.add(buildingDTO);
-		}
-		return results; */
+		/*
+		 * List<BuildingDTO> results = new ArrayList<>(); List<BuildingEntity>
+		 * buildingEntities = buildingRepository.getBuildings(buildingSearchBuilder);
+		 * for (BuildingEntity buildingEntity : buildingEntities) { BuildingDTO
+		 * buildingDTO = buildingConverter.convertToDto(buildingEntity);
+		 * results.add(buildingDTO); } return results;
+		 */
 		List<BuildingEntity> buildingEntities = buildingRepository.getBuildings(buildingSearchBuilder);
 		List<BuildingDTO> results = buildingEntities.stream().map(item -> buildingConverter.convertToDto(item))
-																.collect(Collectors.toList());
+				.collect(Collectors.toList());
 		return results;
 	}
+
 	@Transactional
 	@Override
 	public BuildingDTO save(BuildingDTO buildingDTO) {
@@ -62,9 +72,9 @@ public class BuildingServiceImpl implements IBuildingService {
 		BuildingEntity buildingEntity = buildingConverter.convertToEntity(buildingDTO);
 		String types = buildingDTO.getTypes().stream().map(item -> item).collect(Collectors.joining(" , "));
 		buildingEntity.setTypes(types);
-		buildingEntity = buildingRepository.save(buildingEntity);
-		
+	
 		if (buildingDTO.getRentArea() != null && !buildingDTO.getRentArea().isEmpty()) {
+			List<RentAreaEntity> areaEntities = new ArrayList<>();
 			String rentArea = buildingDTO.getRentArea();
 			String[] valueRentArea = rentArea.split(",");
 			// Insert RentArea
@@ -72,9 +82,11 @@ public class BuildingServiceImpl implements IBuildingService {
 				RentAreaEntity rentAreaEntity = new RentAreaEntity();
 				rentAreaEntity.setValue(Integer.parseInt(value));
 				rentAreaEntity.setBuilding(buildingEntity);
-				rentAreaRepository.save(rentAreaEntity);
+				areaEntities.add(rentAreaEntity);
 			}
+			buildingEntity.setRentArea(areaEntities);
 		}
+		buildingEntity = buildingRepository.save(buildingEntity);
 		BuildingDTO dto = buildingConverter.convertToDto(buildingEntity);
 		return dto;
 	}
@@ -90,9 +102,10 @@ public class BuildingServiceImpl implements IBuildingService {
 //		return results;
 		List<BuildingEntity> buildingEntities = buildingRepository.findAll();
 		List<BuildingDTO> results = buildingEntities.stream().map(item -> buildingConverter.convertToDto(item))
-									.collect(Collectors.toList());
+				.collect(Collectors.toList());
 		return results;
 	}
+
 	@Transactional
 	@Override
 	public BuildingDTO update(BuildingDTO buildingDTO) {
@@ -100,30 +113,84 @@ public class BuildingServiceImpl implements IBuildingService {
 		BuildingEntity oldbuilding = buildingRepository.findOne(buildingDTO.getId());
 		updatebuilding.setModifiedBy(oldbuilding.getModifiedBy());
 		updatebuilding.setModifiedDate(oldbuilding.getModifiedDate());
-		//String sql = "DELTE FROM rentare WHERE buildingId = "+ buildingDTO.getId()+"";
+		// String sql = "DELTE FROM rentare WHERE buildingId = "+
+		// buildingDTO.getId()+"";
 		rentAreaRepository.deleteByBuildingEntityId(buildingDTO.getId());
 		String rentArea = buildingDTO.getRentArea();
 		String[] valueRentArea = rentArea.split(",");
+		List<RentAreaEntity> areaEntities = new ArrayList<>();
 		// Insert RentArea
 		for (String value : valueRentArea) {
 			RentAreaEntity rentAreaEntity = new RentAreaEntity();
 			rentAreaEntity.setValue(Integer.parseInt(value));
 			rentAreaEntity.setBuilding(updatebuilding);
-			rentAreaRepository.save(rentAreaEntity);
+			areaEntities.add(rentAreaEntity);
 		}
 		String types = buildingDTO.getTypes().stream().map(item -> item).collect(Collectors.joining(" , "));
 		updatebuilding.setTypes(types);
+		updatebuilding.setRentArea(areaEntities);
 		buildingRepository.save(updatebuilding);
 		return buildingDTO;
 	}
+
 	@Transactional
 	@Override
 	public void delete(long[] ids) {
 		for (long item : ids) {
-			rentAreaRepository.deleteByBuildingEntityId(item);
+			List<RentAreaEntity> areaEntities =rentAreaRepository.findByBuilding_Id(item);
+			for (RentAreaEntity areaEntity : areaEntities) {
+				rentAreaRepository.delete(areaEntity);
+			}
 			buildingRepository.deleteAssignmentByIdNative(item);
 			buildingRepository.delete(item);
+		}
+	}
+
+	@Transactional
+	@Override
+	public void assignmentBuilding(AssignmentBuildingInput assignmentBuildingInput) {
+		List<UserEntity> userEntities = userRepository
+				.findByUsersBuilding_IdAndRole_Id(assignmentBuildingInput.getBuildingId(), "staff");
+		List<Long> oldUsers = new ArrayList<>();
+		for (UserEntity userEntity : userEntities) {
+			oldUsers.add(userEntity.getId());
+		}
+		List<Long> newUsers = new ArrayList<>();
+		Long[] ids = assignmentBuildingInput.getStaffIds();
+		for (int i = 0; i < ids.length; i++) {
+			newUsers.add(ids[i]);
+		}
+		List<Long> checkedUsers = getIsCheckedUsers(oldUsers, newUsers);
+		List<Long> uncheckedUsers = getIsUncheckedUsers(oldUsers, newUsers);
+		if (!uncheckedUsers.isEmpty()) {
+			for (Long staffId : uncheckedUsers) {
+				buildingRepository.deleteAssignmentByBuildingIdAndStaffIdNative(assignmentBuildingInput.getBuildingId(), staffId);
+			}
+		}
+		if (!checkedUsers.isEmpty()) {
+			for (Long staffId : checkedUsers) {
+				buildingRepository.insertAssignment(assignmentBuildingInput.getBuildingId(), staffId);
 			}
 		}
 	}
 
+	private List<Long> getIsCheckedUsers(List<Long> oldUsers, List<Long> newUsers) {
+		List<Long> result = new ArrayList<>();
+		for (Long newobj : newUsers) {
+			if (!oldUsers.contains(newobj)) {
+				result.add(newobj);
+			}
+		}
+		return result;
+	}
+
+	private List<Long> getIsUncheckedUsers(List<Long> oldUsers, List<Long> newUsers) {
+		List<Long> result = new ArrayList<>();
+		for (Long oldobj : oldUsers) {
+			if (!newUsers.contains(oldobj)) {
+				result.add(oldobj);
+			}
+		}
+		return result;
+	}
+}
