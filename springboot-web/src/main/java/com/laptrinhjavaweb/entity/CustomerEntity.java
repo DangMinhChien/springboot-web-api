@@ -9,7 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 @Entity
 @Table(name = "customer")
@@ -37,9 +37,8 @@ public class CustomerEntity extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
     private List<UserEntity> userCustomer = new ArrayList<>();
 
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction")
-    private TransactionEntity transaction;
+	@OneToMany(mappedBy = "transaction")
+	private List<TransactionEntity> transaction = new ArrayList<>();
 	
 	public List<UserEntity> getUserCustomer() {
 		return userCustomer;

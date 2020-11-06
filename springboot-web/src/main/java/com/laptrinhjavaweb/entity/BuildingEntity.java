@@ -10,10 +10,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import lombok.Data;
 
 @Entity
 @Table(name = "building")
+@Data
 public class BuildingEntity extends BaseEntity {
 	/**
 	 * 
@@ -96,14 +100,6 @@ public class BuildingEntity extends BaseEntity {
 
 	@Column(name = "avatar")
 	private String avatar;
-	
-	public List<UserEntity> getUsers() {
-		return userBulding;
-	}
-
-	public void setUsers(List<UserEntity> users) {
-		this.userBulding = users;
-	}
 
 	@ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "assignmentbuilding",
@@ -111,215 +107,7 @@ public class BuildingEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
     private List<UserEntity> userBulding = new ArrayList<>();
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rentarea")
-    private RentareEntity rentarea;
+	@OneToMany(mappedBy = "building")
+	private List<RentAreaEntity> rentArea = new ArrayList<>();
 	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Integer getNumberOfBasement() {
-		return numberOfBasement;
-	}
-
-	public void setNumberOfBasement(Integer numberOfBasement) {
-		this.numberOfBasement = numberOfBasement;
-	}
-
-	public Integer getFloorArea() {
-		return floorArea;
-	}
-
-	public void setFloorArea(Integer floorArea) {
-		this.floorArea = floorArea;
-	}
-
-	public String getWard() {
-		return ward;
-	}
-
-	public void setWard(String ward) {
-		this.ward = ward;
-	}
-
-	public String getDistrict() {
-		return district;
-	}
-
-	public void setDistrict(String district) {
-		this.district = district;
-	}
-
-	public String getSrteet() {
-		return srteet;
-	}
-
-	public void setSrteet(String srteet) {
-		this.srteet = srteet;
-	}
-
-	public String getDirection() {
-		return direction;
-	}
-
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
-
-	public String getLevel() {
-		return level;
-	}
-
-	public void setLevel(String level) {
-		this.level = level;
-	}
-
-	public Integer getRentPrice() {
-		return rentPrice;
-	}
-
-	public void setRentPrice(Integer rentPrice) {
-		this.rentPrice = rentPrice;
-	}
-
-	public String getRentPriceDescription() {
-		return rentPriceDescription;
-	}
-
-	public void setRentPriceDescription(String rentPriceDescription) {
-		this.rentPriceDescription = rentPriceDescription;
-	}
-
-	public String getServiceFee() {
-		return serviceFee;
-	}
-
-	public void setServiceFee(String serviceFee) {
-		this.serviceFee = serviceFee;
-	}
-
-	public Integer getCarFee() {
-		return carFee;
-	}
-
-	public void setCarFee(Integer carFee) {
-		this.carFee = carFee;
-	}
-
-	public String getMotoFee() {
-		return motoFee;
-	}
-
-	public void setMotoFee(String motoFee) {
-		this.motoFee = motoFee;
-	}
-
-	public String getOvertimeFee() {
-		return overtimeFee;
-	}
-
-	public void setOvertimeFee(String overtimeFee) {
-		this.overtimeFee = overtimeFee;
-	}
-
-	public String getWaterFee() {
-		return waterFee;
-	}
-
-	public void setWaterFee(String waterFee) {
-		this.waterFee = waterFee;
-	}
-
-	public String getElectricityFee() {
-		return electricityFee;
-	}
-
-	public void setElectricityFee(String electricityFee) {
-		this.electricityFee = electricityFee;
-	}
-
-	public String getDeposit() {
-		return deposit;
-	}
-
-	public void setDeposit(String deposit) {
-		this.deposit = deposit;
-	}
-
-	public String getPayment() {
-		return payment;
-	}
-
-	public void setPayment(String payment) {
-		this.payment = payment;
-	}
-
-	public String getRentTime() {
-		return rentTime;
-	}
-
-	public void setRentTime(String rentTime) {
-		this.rentTime = rentTime;
-	}
-
-	public String getDecorationTime() {
-		return decorationTime;
-	}
-
-	public void setDecorationTime(String decorationTime) {
-		this.decorationTime = decorationTime;
-	}
-
-	public Float getBrokerageFee() {
-		return brokerageFee;
-	}
-
-	public void setBrokerageFee(Float brokerageFee) {
-		this.brokerageFee = brokerageFee;
-	}
-
-	public String getTypes() {
-		return types;
-	}
-
-	public void setTypes(String types) {
-		this.types = types;
-	}
-
-	public String getNote() {
-		return note;
-	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	public String getLinkBuilding() {
-		return linkBuilding;
-	}
-
-	public void setLinkBuilding(String linkBuilding) {
-		this.linkBuilding = linkBuilding;
-	}
-
-	public String getMap() {
-		return map;
-	}
-
-	public void setMap(String map) {
-		this.map = map;
-	}
-
-	public String getAvatar() {
-		return avatar;
-	}
-
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
-	}
 }

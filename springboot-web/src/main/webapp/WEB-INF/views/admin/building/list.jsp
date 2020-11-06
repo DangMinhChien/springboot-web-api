@@ -1,5 +1,8 @@
 <%@include file="/common/taglib.jsp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<c:url var="buildingListURL" value="/admin/building-list"/>
+<c:url var="deleteBuilding" value="/buildings"/>
+<c:url var="assignmentBuilding" value="/building/assignment"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -233,11 +236,8 @@
 										<a class="btn btn-xs btn-info" >
 											<i class="fa fa-pencil-square-o" data-toggle="tooltip" title="Sửa chi tiết tòa nhà" ></i>
 										</a>
-									<button class="btn btn-xs btn-info" onclick="assignmentBuilding(1)">
+									<button class="btn btn-xs btn-info" onclick="assignmentBuilding(${item.name})">
 											<i class="fa fa-bars" data-toggle="tooltip" title="Giao tòa nhà" ></i>
-										</button>
-									<button class="btn btn-xs btn-info">
-											<i class="fa fa-plus" data-toggle="tooltip" title="Giao tòa nhà" ></i>
 										</button></td>
 								</tr>	
 								<tr>
@@ -320,6 +320,7 @@
 			}
 			openModalAssignmentBuilding=()=>{
 				$('#assignmentBuildingModal').modal();
+				
 			}
 			$("#btnAssignBuilding").click(function (e) { 
 				e.preventDefault();
@@ -334,7 +335,7 @@
 			function assignStaff(data){
 				$.ajax({
 					type: "POST",
-					url: "url",
+					url: '${assignmentBuilding}',
 					data: JSON.stringify(data),
 					dataType: "json",
 					contentType:"application/json",
@@ -358,7 +359,7 @@
 			function deleteBuilding(data){
 				$.ajax({
 					type: "DELETE",
-					url: "url",
+					url: '${deleteBuilding}',
 					data: JSON.stringify(data),
 					dataType: "json",
 					contentType:"application/json",
